@@ -602,8 +602,8 @@ static int mt_compute_slot(struct mt_device *td, struct input_dev *input)
 	return input_mt_get_slot_by_key(input, td->curdata.contactid);
 }
 
-extern bool touch_invert_x;
-extern bool touch_invert_y;
+extern bool touch_invert_x = false;
+extern bool touch_invert_y = false;
 /*
  * this function is called when a whole contact has been processed,
  * so that it can assign it to a slot and store the data there

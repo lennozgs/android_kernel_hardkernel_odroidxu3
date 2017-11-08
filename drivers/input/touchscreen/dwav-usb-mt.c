@@ -41,11 +41,16 @@ struct usbtouch_device_info	{
 //[*]-------------------------------------------------------------------------[*]
 const struct usbtouch_device_info DEV_INFO[] = {
 	[ODROID_VU7] = {
-		.name		= "ODROID VU7 MultiTouch(800x480)",
-		.max_x		= 800,
-		.max_y		= 480,
-		.max_press	= 255,
-		.max_finger	= 5,
+//		.name		= "ODROID VU7 MultiTouch(800x480)",
+//		.max_x		= 800,
+//		.max_y		= 480,
+//		.max_press	= 255,
+//		.max_finger	= 5,
+                .name           = "ODROID VU7 Plus MultiTouch(1024x600)",
+                .max_x          = 1024,
+                .max_y          = 600,
+                .max_press      = 255,
+                .max_finger     = 5,
 	},
 	[ODROID_VU5] = {
 		.name		= "ODROID VU5 MultiTouch(800x480)",
