@@ -66,6 +66,7 @@
 		samsung,dw-mshc-ddr-timing = <3 0 2 0>;
 		samsung,dw-mshc-hs200-timing = <3 0 2 0>;
 		samsung,dw-mshc-ddr200-timing = <1 1 2 0>;
+		samsung,dw-mshc-ddr200-delay-line = <150>;
 		vmmc-supply = <&buck10_reg>;
 		vqmmc-supply = <&ldo18_reg>;
 		clk_pin = "gpc0-0";
@@ -930,6 +931,13 @@
 
 	odroid_sysfs {
 		compatible = "odroid-sysfs";
+	};
+
+	gpiomem {
+		compatible = "samsung,exynos-gpiomem";
+		reg = <0x13400000 0x1000>,
+		      <0x14010000 0x1000>;
+		status = "okay";
 	};
 
 	leds {
