@@ -463,6 +463,18 @@
 		};
 	};
 
+	/*
+        hsi2c@12CB0000 {
+                samsung,hs-mode;
+                clock-frequency = <400000>;
+                status = "okay";
+                audio_codec: codec@10 {
+                        compatible = "maxim,max98090";
+                        reg = <0x10>;
+                };
+        };
+	*/
+
 	pinctrl@13400000 {
 		b_sess0_irq: b-sess0-irq {
 			samsung,pins = "gpx3-5";
@@ -789,6 +801,21 @@
                         &audio_codec_dummy>;
                 status = "okay";
         };
+
+	/*
+	sound {
+		compatible = "hardkernel,odroid-max98090";
+		clocks = <&clock 6>;		/* fout_epll */
+		clock-names = "fout_epll";
+		samsung,audio-cpu = <&i2s0		/* primary */
+			&i2s0>;		/* secondary */
+		samsung,audio-codec = <&audio_codec
+			&audio_codec>;
+		samsung,audio-dummy = <&audio_codec_dummy
+			&audio_codec_dummy>;
+		status = "okay";
+	};
+	*/
 
 	display-port-controller {
 		hsync-active-high = <0>;
