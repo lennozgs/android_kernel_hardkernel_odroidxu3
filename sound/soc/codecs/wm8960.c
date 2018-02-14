@@ -110,11 +110,13 @@ static const struct reg_sequence wm8960_reg_defaults[] = {
 
 static bool wm8960_volatile(struct device *dev, unsigned int reg)
 {
-	printk("@@@ [%s][%s:%d]", __FILE__, __func__, __LINE__);
+	printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	switch (reg) {
 	case WM8960_RESET:
+		printk("	reg=WM8960_RESET\n");
 		return true;
 	default:
+                printk("        reg=%u\n", reg);
 		return false;
 	}
 }
@@ -156,7 +158,7 @@ static int wm8960_set_deemph(struct snd_soc_codec *codec)
 	struct wm8960_priv *wm8960 = snd_soc_codec_get_drvdata(codec);
 	int val, i, best;
 
-	printk("@@@ [%s][%s:%d]", __FILE__, __func__, __LINE__);
+	printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 
 	/* If we're using deemphasis select the nearest available sample
 	 * rate.
@@ -184,7 +186,7 @@ static int wm8960_get_deemph(struct snd_kcontrol *kcontrol,
 			     struct snd_ctl_elem_value *ucontrol)
 {
 
-        printk("@@@ [%s][%s:%d]", __FILE__, __func__, __LINE__);
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 
 	struct snd_soc_codec *codec = snd_kcontrol_chip(kcontrol);
 	struct wm8960_priv *wm8960 = snd_soc_codec_get_drvdata(codec);
@@ -197,13 +199,15 @@ static int wm8960_put_deemph(struct snd_kcontrol *kcontrol,
 			     struct snd_ctl_elem_value *ucontrol)
 {
 
-        printk("@@@ [%s][%s:%d]", __FILE__, __func__, __LINE__);
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	struct snd_soc_codec *codec = snd_kcontrol_chip(kcontrol);
 	struct wm8960_priv *wm8960 = snd_soc_codec_get_drvdata(codec);
 	int deemph = ucontrol->value.enumerated.item[0];
 
-	if (deemph > 1)
+	if (deemph > 1){
+		printk("        ERROR: deemph > 1\n");
 		return -EINVAL;
+	}
 
 	wm8960->deemph = deemph;
 
@@ -451,7 +455,7 @@ static const struct snd_soc_dapm_route audio_paths_capless[] = {
 static int wm8960_add_widgets(struct snd_soc_codec *codec)
 {
 
-        printk("@@@ [%s][%s:%d]", __FILE__, __func__, __LINE__);
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	struct wm8960_data *pdata = codec->dev->platform_data;
 	struct wm8960_priv *wm8960 = snd_soc_codec_get_drvdata(codec);
 	struct snd_soc_dapm_context *dapm = &codec->dapm;
@@ -502,7 +506,7 @@ static int wm8960_set_dai_fmt(struct snd_soc_dai *codec_dai,
 		unsigned int fmt)
 {
 
-        printk("@@@ [%s][%s:%d]", __FILE__, __func__, __LINE__);
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	struct snd_soc_codec *codec = codec_dai->codec;
 	u16 iface = 0;
 
@@ -579,7 +583,7 @@ static int wm8960_hw_params(struct snd_pcm_substream *substream,
 			    struct snd_soc_dai *dai)
 {
 
-        printk("@@@ [%s][%s:%d]", __FILE__, __func__, __LINE__);
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	struct snd_soc_codec *codec = dai->codec;
 	struct wm8960_priv *wm8960 = snd_soc_codec_get_drvdata(codec);
 	u16 iface = snd_soc_read(codec, WM8960_IFACE1) & 0xfff3;
@@ -624,7 +628,7 @@ static int wm8960_hw_params(struct snd_pcm_substream *substream,
 static int wm8960_mute(struct snd_soc_dai *dai, int mute)
 {
 
-        printk("@@@ [%s][%s:%d]", __FILE__, __func__, __LINE__);
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	struct snd_soc_codec *codec = dai->codec;
 
 	if (mute)
@@ -638,7 +642,7 @@ static int wm8960_set_bias_level_out3(struct snd_soc_codec *codec,
 				      enum snd_soc_bias_level level)
 {
 
-        printk("@@@ [%s][%s:%d]", __FILE__, __func__, __LINE__);
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	struct wm8960_priv *wm8960 = snd_soc_codec_get_drvdata(codec);
 
 	switch (level) {
@@ -696,7 +700,7 @@ static int wm8960_set_bias_level_capless(struct snd_soc_codec *codec,
 					 enum snd_soc_bias_level level)
 {
 
-        printk("@@@ [%s][%s:%d]", __FILE__, __func__, __LINE__);
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	struct wm8960_priv *wm8960 = snd_soc_codec_get_drvdata(codec);
 	int reg;
 
@@ -807,11 +811,11 @@ static int pll_factors(unsigned int source, unsigned int target,
 		       struct _pll_div *pll_div)
 {
 
-        printk("@@@ [%s][%s:%d]", __FILE__, __func__, __LINE__);
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	unsigned long long Kpart;
 	unsigned int K, Ndiv, Nmod;
 
-	pr_debug("WM8960 PLL: setting %dHz->%dHz\n", source, target);
+	pr_info("WM8960 PLL: setting %dHz->%dHz\n", source, target);
 
 	/* Scale up target to PLL operating frequency */
 	target *= 4;
@@ -846,7 +850,7 @@ static int pll_factors(unsigned int source, unsigned int target,
 
 	pll_div->k = K;
 
-	pr_debug("WM8960 PLL: N=%x K=%x pre_div=%d\n",
+	pr_info("WM8960 PLL: N=%x K=%x pre_div=%d\n",
 		 pll_div->n, pll_div->k, pll_div->pre_div);
 
 	return 0;
@@ -856,7 +860,7 @@ static int wm8960_set_dai_pll(struct snd_soc_dai *codec_dai, int pll_id,
 		int source, unsigned int freq_in, unsigned int freq_out)
 {
 
-        printk("@@@ [%s][%s:%d]", __FILE__, __func__, __LINE__);
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	struct snd_soc_codec *codec = codec_dai->codec;
 	u16 reg;
 	static struct _pll_div pll_div;
@@ -901,7 +905,7 @@ static int wm8960_set_dai_clkdiv(struct snd_soc_dai *codec_dai,
 		int div_id, int div)
 {
 
-        printk("@@@ [%s][%s:%d]", __FILE__, __func__, __LINE__);
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	struct snd_soc_codec *codec = codec_dai->codec;
 	u16 reg;
 
@@ -937,7 +941,7 @@ static int wm8960_set_bias_level(struct snd_soc_codec *codec,
 				 enum snd_soc_bias_level level)
 {
 
-        printk("@@@ [%s][%s:%d]", __FILE__, __func__, __LINE__);
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	struct wm8960_priv *wm8960 = snd_soc_codec_get_drvdata(codec);
 
 	return wm8960->set_bias_level(codec, level);
@@ -978,7 +982,7 @@ static struct snd_soc_dai_driver wm8960_dai = {
 static int wm8960_suspend(struct snd_soc_codec *codec)
 {
 
-        printk("@@@ [%s][%s:%d]", __FILE__, __func__, __LINE__);
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	struct wm8960_priv *wm8960 = snd_soc_codec_get_drvdata(codec);
 
 	wm8960->set_bias_level(codec, SND_SOC_BIAS_OFF);
@@ -988,7 +992,7 @@ static int wm8960_suspend(struct snd_soc_codec *codec)
 static int wm8960_resume(struct snd_soc_codec *codec)
 {
 
-        printk("@@@ [%s][%s:%d]", __FILE__, __func__, __LINE__);
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	struct wm8960_priv *wm8960 = snd_soc_codec_get_drvdata(codec);
 
 	wm8960->set_bias_level(codec, SND_SOC_BIAS_STANDBY);
@@ -998,7 +1002,7 @@ static int wm8960_resume(struct snd_soc_codec *codec)
 static int wm8960_probe(struct snd_soc_codec *codec)
 {
 
-        printk("@@@ [%s][%s:%d]", __FILE__, __func__, __LINE__);
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	struct wm8960_priv *wm8960 = snd_soc_codec_get_drvdata(codec);
 	struct wm8960_data *pdata = dev_get_platdata(codec->dev);
 	int ret;
@@ -1049,7 +1053,7 @@ static int wm8960_probe(struct snd_soc_codec *codec)
 static int wm8960_remove(struct snd_soc_codec *codec)
 {
 
-        printk("@@@ [%s][%s:%d]", __FILE__, __func__, __LINE__);
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	struct wm8960_priv *wm8960 = snd_soc_codec_get_drvdata(codec);
 
 	wm8960->set_bias_level(codec, SND_SOC_BIAS_OFF);
@@ -1080,19 +1084,23 @@ static int wm8960_i2c_probe(struct i2c_client *i2c,
 			    const struct i2c_device_id *id)
 {
 
-        printk("@@@ [%s][%s:%d]", __FILE__, __func__, __LINE__);
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	struct wm8960_data *pdata = dev_get_platdata(&i2c->dev);
 	struct wm8960_priv *wm8960;
 	int ret;
 
 	wm8960 = devm_kzalloc(&i2c->dev, sizeof(struct wm8960_priv),
 			      GFP_KERNEL);
-	if (wm8960 == NULL)
+	if (wm8960 == NULL){
+		printk("	ERROR: devm_kzalloc() return NULL\n");
 		return -ENOMEM;
+	}
 
 	wm8960->regmap = devm_regmap_init_i2c(i2c, &wm8960_regmap);
-	if (IS_ERR(wm8960->regmap))
+	if (IS_ERR(wm8960->regmap)){
+		printk("        ERROR: devm_regmap_init_i2c()\n");
 		return PTR_ERR(wm8960->regmap);
+	}
 
 	if (pdata && pdata->shared_lrclk) {
 		ret = regmap_update_bits(wm8960->regmap, WM8960_ADDCTL2,
@@ -1115,7 +1123,7 @@ static int wm8960_i2c_probe(struct i2c_client *i2c,
 static int wm8960_i2c_remove(struct i2c_client *client)
 {
 
-        printk("@@@ [%s][%s:%d]", __FILE__, __func__, __LINE__);
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	snd_soc_unregister_codec(&client->dev);
 	return 0;
 }

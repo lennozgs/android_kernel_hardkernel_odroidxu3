@@ -38,7 +38,7 @@ static int set_aud_pll_rate(unsigned long rate)
 {
 	struct clk *fout_epll;
 
-	printk("@@@ [%s][%s:%d]", __FILE__, __func__, __LINE__);
+	printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 
 	fout_epll = __clk_lookup("fout_epll");
 	if (IS_ERR(fout_epll)) {
@@ -70,11 +70,12 @@ static int odroid_hw_params(struct snd_pcm_substream *substream,
 	int pll, div, sclk, bfs, psr, rfs, ret;
 	unsigned long rclk;
 
-        printk("@@@ [%s][%s:%d]", __FILE__, __func__, __LINE__);
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 
 	switch (params_format(params)) {
 	case SNDRV_PCM_FORMAT_U24:
 	case SNDRV_PCM_FORMAT_S24:
+		printk("        params_format(params)=%u\n", params_format(params));
 		bfs = 48;
 		break;
 	case SNDRV_PCM_FORMAT_U16_LE:
@@ -84,6 +85,10 @@ static int odroid_hw_params(struct snd_pcm_substream *substream,
 	default:
 		return -EINVAL;
 	}
+
+	printk("        params_format(params)=%u\n", params_format(params));
+	printk("        params_rate(params)=%u\n", params_rate(params));
+
 
 	switch (params_rate(params)) {
 	case 16000:
@@ -148,22 +153,24 @@ static int odroid_hw_params(struct snd_pcm_substream *substream,
 
 	/* Set AUD_PLL frequency */
 	sclk = rclk * psr;
+	printk("        sclk=%u\n", sclk);
 	for (div = 2; div <= 16; div++) {
 		if (sclk * div > ODROID_AUD_PLL_FREQ)
 			break;
 	}
 	pll = sclk * (div - 1);
+	printk("        pll=%u\n", pll);
 
 	set_aud_pll_rate(pll);
 
 	/* Set CPU DAI configuration */
 	if(!is_dummy_codec) {
-    	ret = snd_soc_dai_set_fmt(codec_dai, SND_SOC_DAIFMT_I2S
+    		ret = snd_soc_dai_set_fmt(codec_dai, SND_SOC_DAIFMT_I2S
     			| SND_SOC_DAIFMT_NB_NF
     			| SND_SOC_DAIFMT_CBS_CFS);
-    	if (ret < 0)
-    		return ret;
-    }
+    		if (ret < 0)
+    			return ret;
+    	}
 
 	ret = snd_soc_dai_set_fmt(cpu_dai, SND_SOC_DAIFMT_I2S
 			| SND_SOC_DAIFMT_NB_NF
@@ -191,11 +198,12 @@ static int odroid_hw_params(struct snd_pcm_substream *substream,
 		return ret;
 
 	if(!is_dummy_codec) {
-    	ret = snd_soc_dai_set_sysclk(codec_dai, 0, rclk, SND_SOC_CLOCK_IN);
-    	if (ret < 0)
-    		return ret;
-    }
+    		ret = snd_soc_dai_set_sysclk(codec_dai, 0, rclk, SND_SOC_CLOCK_IN);
+    		if (ret < 0)
+    			return ret;
+    	}
 
+	printk("        %s will return 0\n", __func__);
 	return 0;
 }
 
@@ -234,7 +242,7 @@ static int odroid_audio_probe(struct platform_device *pdev)
 	struct snd_soc_card *card = &odroid;
 	card->dev = &pdev->dev;
 
-        printk("@@@ [%s][%s:%d]", __FILE__, __func__, __LINE__);
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 
 	for (n = 0; np && n < ARRAY_SIZE(odroid_dai); n++) {
 		if (!odroid_dai[n].cpu_dai_name) {
@@ -298,7 +306,7 @@ static int odroid_audio_remove(struct platform_device *pdev)
 {
 	struct snd_soc_card *card = platform_get_drvdata(pdev);
 
-        printk("@@@ [%s][%s:%d]", __FILE__, __func__, __LINE__);
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 
 	snd_soc_unregister_card(card);
 
