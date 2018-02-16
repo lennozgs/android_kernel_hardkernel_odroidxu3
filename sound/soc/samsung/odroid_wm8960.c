@@ -342,7 +342,7 @@ static int odroid_audio_probe(struct platform_device *pdev)
 /*******
 FROM smdk5422_wm8994.c
 *******/
-
+/*
 		if (!odroid_dai[n].codec_name) {
 			odroid_dai[n].codec_of_node = of_parse_phandle(np,
 				"samsung,audio-codec", n);
@@ -352,9 +352,8 @@ FROM smdk5422_wm8994.c
 				ret = -EINVAL;
 			}
 		}
+*/
 
-
-/*
 		odroid_dai[n].codec_name = NULL;
 		odroid_dai[n].codec_of_node = of_parse_phandle(np,
 				"samsung,audio-codec", n);
@@ -363,7 +362,6 @@ FROM smdk5422_wm8994.c
 			"Property 'samsung,audio-codec' missing or invalid\n");
 			ret = -EINVAL;
 		}
-*/
 /**********
 /FROM smdk5422_wm8994.c
 **********/
