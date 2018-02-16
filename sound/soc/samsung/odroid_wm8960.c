@@ -17,6 +17,7 @@
 #include <linux/clkdev.h>
 #include <linux/clk-provider.h>
 
+#include "../codecs/wm8960.h"
 #include <sound/soc.h>
 #include <sound/pcm.h>
 #include <sound/pcm_params.h>
@@ -75,7 +76,6 @@ static int odroid_hw_params(struct snd_pcm_substream *substream,
 	switch (params_format(params)) {
 	case SNDRV_PCM_FORMAT_U24:
 	case SNDRV_PCM_FORMAT_S24:
-		printk("        params_format(params)=%u\n", params_format(params));
 		bfs = 48;
 		break;
 	case SNDRV_PCM_FORMAT_U16_LE:
@@ -87,8 +87,14 @@ static int odroid_hw_params(struct snd_pcm_substream *substream,
 	}
 
 	printk("        params_format(params)=%u\n", params_format(params));
-	printk("        params_rate(params)=%u\n", params_rate(params));
-
+	if(params_format(params) == SNDRV_PCM_FORMAT_U24)
+	printk("        format=SNDRV_PCM_FORMAT_U24\n");
+        if(params_format(params) == SNDRV_PCM_FORMAT_S24)
+        printk("        format=SNDRV_PCM_FORMAT_U24\n");
+        if(params_format(params) == SNDRV_PCM_FORMAT_U16_LE)
+        printk("        format=SNDRV_PCM_FORMAT_U16_LE\n");
+        if(params_format(params) == SNDRV_PCM_FORMAT_S16_LE)
+        printk("        format=SNDRV_PCM_FORMAT_S16_LE\n");
 
 	switch (params_rate(params)) {
 	case 16000:
@@ -151,6 +157,8 @@ static int odroid_hw_params(struct snd_pcm_substream *substream,
 		return -EINVAL;
 	}
 
+	printk("        bfs=%d, rfs=%d, psr=%d, rclk=%lu\n", bfs, rfs, psr, rclk);
+
 	/* Set AUD_PLL frequency */
 	sclk = rclk * psr;
 	printk("        sclk=%u\n", sclk);
@@ -168,61 +176,131 @@ static int odroid_hw_params(struct snd_pcm_substream *substream,
     		ret = snd_soc_dai_set_fmt(codec_dai, SND_SOC_DAIFMT_I2S
     			| SND_SOC_DAIFMT_NB_NF
     			| SND_SOC_DAIFMT_CBS_CFS);
-    		if (ret < 0)
+    		if (ret < 0){
+			printk("	[%s]ERROR(%d)\n", __func__, __LINE__);
     			return ret;
+		}
     	}
 
 	ret = snd_soc_dai_set_fmt(cpu_dai, SND_SOC_DAIFMT_I2S
 			| SND_SOC_DAIFMT_NB_NF
 			| SND_SOC_DAIFMT_CBS_CFS);
-	if (ret < 0)
+	if (ret < 0){
+                printk("        ERROR:[%s][%s]:%d\n", __FILE__,  __func__, __LINE__);
 		return ret;
+	}
 
 	ret = snd_soc_dai_set_sysclk(cpu_dai, SAMSUNG_I2S_OPCLK,
 					0, MOD_OPCLK_PCLK);
-	if (ret < 0)
+	if (ret < 0){
+                printk("        ERROR:[%s][%s]:%d\n", __FILE__,  __func__, __LINE__);
 		return ret;
+	}
 
 	ret = snd_soc_dai_set_sysclk(cpu_dai, SAMSUNG_I2S_RCLKSRC_1,
 					rclk, SND_SOC_CLOCK_OUT);
-	if (ret < 0)
+	if (ret < 0){
+		printk("        ERROR:[%s][%s]:%d\n", __FILE__,  __func__, __LINE__);
 		return ret;
+	}
 
 	ret = snd_soc_dai_set_sysclk(cpu_dai, SAMSUNG_I2S_CDCLK,
 					rfs, SND_SOC_CLOCK_OUT);
-	if (ret < 0)
+	if (ret < 0){
+		printk("        ERROR:[%s][%s]:%d\n", __FILE__,  __func__, __LINE__);
 		return ret;
+	}
 
 	ret = snd_soc_dai_set_clkdiv(cpu_dai, SAMSUNG_I2S_DIV_BCLK, bfs);
-	if (ret < 0)
+	if (ret < 0){
+		printk("        ERROR:[%s][%s]:%d\n", __FILE__,  __func__, __LINE__);
 		return ret;
+	}
 
 	if(!is_dummy_codec) {
     		ret = snd_soc_dai_set_sysclk(codec_dai, 0, rclk, SND_SOC_CLOCK_IN);
-    		if (ret < 0)
+    		if (ret < 0){
+			printk("        ERROR:[%s][%s]:%d\n", __FILE__,  __func__, __LINE__);
     			return ret;
+		}
     	}
 
 	printk("        %s will return 0\n", __func__);
 	return 0;
 }
 
+
+
 static struct snd_soc_ops odroid_ops = {
 	.hw_params = odroid_hw_params,
+//	.hw_params = wm8960_be_ops_hw_params,
 };
+
+static int smdk_wm8960_init_paiftx(struct snd_soc_pcm_runtime *rtd)
+{
+        struct snd_soc_codec *codec = rtd->codec;
+        struct snd_soc_dapm_context *dapm = &codec->dapm;
+
+        /* HeadPhone */
+        snd_soc_dapm_enable_pin(dapm, "HP_R");
+        snd_soc_dapm_enable_pin(dapm, "HP_L");
+
+        /* MicIn */
+        snd_soc_dapm_enable_pin(dapm, "LINPUT1");
+        snd_soc_dapm_enable_pin(dapm, "RINPUT1");
+
+        /* LineIn */
+        snd_soc_dapm_enable_pin(dapm, "LINPUT2");
+        snd_soc_dapm_enable_pin(dapm, "RINPUT2");
+
+        /* Other pins NC */
+        snd_soc_dapm_nc_pin(dapm, "LINPUT3");
+        snd_soc_dapm_nc_pin(dapm, "RINPUT3");
+        snd_soc_dapm_nc_pin(dapm, "SPK_RN");
+        snd_soc_dapm_nc_pin(dapm, "SPK_LN");
+        snd_soc_dapm_nc_pin(dapm, "SPK_RP");
+        snd_soc_dapm_nc_pin(dapm, "SPK_LP");
+        snd_soc_dapm_nc_pin(dapm, "OUT3");
+
+        return 0;
+}
+
+
+static int smdk_set_bias_level_post(struct snd_soc_card *card,
+                                struct snd_soc_dapm_context *dapm,
+                                enum snd_soc_bias_level level)
+{
+        struct snd_soc_dai *aif1_dai = card->rtd[0].codec_dai;
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
+
+        if (dapm->dev != aif1_dai->dev){
+		printk("	dapm->dev != aif1_dai->dev\n");
+                return 0;
+	}
+
+        if ((level == SND_SOC_BIAS_OFF) && !aif1_dai->active) {
+                printk("%s: SND_SOC_BIAS_OFF\n", __func__);
+//                smdk_codec_fll_enable(aif1_dai, 0);
+        }
+
+        return 0;
+}
 
 static struct snd_soc_dai_link odroid_dai[] = {
 	{
 		.name = "WM8960 AIF1",
-		.stream_name = "i2s0-sec",
-		.cpu_dai_name = "samsung-i2s-sec",
-                .platform_name = "samsung-i2s-sec",
-		.codec_dai_name = "wm8960-hifi",
+		.stream_name = "i2s0-pri",
+                .codec_name = "wm8960",
+                .codec_dai_name = "wm8960-hifi",
+		.init = smdk_wm8960_init_paiftx,
 		.ops = &odroid_ops,
 	},
 	{
                 .name = "WM8960 AIF2",
-                .stream_name = "i2s0-pri",
+                .stream_name = "i2s0-sec",
+                .cpu_dai_name = "samsung-i2s-sec",
+                .platform_name = "samsung-i2s-sec",
+                .codec_name = "wm8960",
                 .codec_dai_name = "wm8960-hifi",
                 .ops = &odroid_ops,
 	},
@@ -233,6 +311,8 @@ static struct snd_soc_card odroid = {
 	.owner = THIS_MODULE,
 	.dai_link = odroid_dai,
 	.num_links = ARRAY_SIZE(odroid_dai),
+//	.set_bias_level_post = smdk_set_bias_level_post,
+//	.dapm_widgets = wm8960_dapm_widgets
 };
 
 static int odroid_audio_probe(struct platform_device *pdev)
@@ -259,6 +339,22 @@ static int odroid_audio_probe(struct platform_device *pdev)
 		if (!odroid_dai[n].platform_name)
 			odroid_dai[n].platform_of_node = odroid_dai[n].cpu_of_node;
 
+/*******
+FROM smdk5422_wm8994.c
+*******/
+
+		if (!odroid_dai[n].codec_name) {
+			odroid_dai[n].codec_of_node = of_parse_phandle(np,
+				"samsung,audio-codec", n);
+			if (!odroid_dai[0].codec_of_node) {
+				dev_err(&pdev->dev, "Property "
+				"'samsung,audio-codec' missing or invalid\n");
+				ret = -EINVAL;
+			}
+		}
+
+
+/*
 		odroid_dai[n].codec_name = NULL;
 		odroid_dai[n].codec_of_node = of_parse_phandle(np,
 				"samsung,audio-codec", n);
@@ -267,34 +363,38 @@ static int odroid_audio_probe(struct platform_device *pdev)
 			"Property 'samsung,audio-codec' missing or invalid\n");
 			ret = -EINVAL;
 		}
+*/
+/**********
+/FROM smdk5422_wm8994.c
+**********/
 	}
 
 	ret = snd_soc_register_card(card);
 	if (ret) { // WM8960 register failed.
-        dev_err(&pdev->dev, "snd_soc_register_card() failed(wm8960): %d\n", ret);
+	        dev_err(&pdev->dev, "snd_soc_register_card() failed(wm8960): %d\n", ret);
 
-        odroid_dai[0].name="DUMMY-SEC";
-        odroid_dai[0].stream_name = "i2s0-sec";
-        odroid_dai[0].codec_dai_name="dummy-aif1";
+	        odroid_dai[0].name="DUMMY-SEC";
+	        odroid_dai[0].stream_name = "i2s0-sec";
+	        odroid_dai[0].codec_dai_name="dummy-aif1";
 
-        odroid_dai[1].name="DUMMY-PRI";
-        odroid_dai[1].stream_name = "i2s0-pri";
-        odroid_dai[1].codec_dai_name="dummy-aif2";
+	        odroid_dai[1].name="DUMMY-PRI";
+	        odroid_dai[1].stream_name = "i2s0-pri";
+	        odroid_dai[1].codec_dai_name="dummy-aif2";
 
-    	for (n = 0; np && n < ARRAY_SIZE(odroid_dai); n++) {
-    		odroid_dai[n].codec_name = NULL;
-    		odroid_dai[n].codec_of_node = of_parse_phandle(np,
+    		for (n = 0; np && n < ARRAY_SIZE(odroid_dai); n++) {
+	    		odroid_dai[n].codec_name = NULL;
+    			odroid_dai[n].codec_of_node = of_parse_phandle(np,
     				"samsung,audio-dummy", n);
-    		if (!odroid_dai[n].codec_of_node) {
-    			dev_err(&pdev->dev,
-    			"Property 'samsung,audio-dummy' missing or invalid\n");
-    			ret = -EINVAL;
+    			if (!odroid_dai[n].codec_of_node) {
+	    			dev_err(&pdev->dev,
+	    			"Property 'samsung,audio-dummy' missing or invalid\n");
+    				ret = -EINVAL;
+	    		}
     		}
-    	}
-    	ret = snd_soc_register_card(card);
-    	if (ret) {
-            dev_err(&pdev->dev, "snd_soc_register_card() failed(dummy_codec): %d\n", ret);
-            is_dummy_codec=false;
+	    	ret = snd_soc_register_card(card);
+	    	if (ret) {
+	            dev_err(&pdev->dev, "snd_soc_register_card() failed(dummy_codec): %d\n", ret);
+	            is_dummy_codec=false;
 		}
 		else is_dummy_codec=true;
 	}

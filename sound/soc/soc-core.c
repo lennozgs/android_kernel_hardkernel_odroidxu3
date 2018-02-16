@@ -21,7 +21,7 @@
  *   o Add more codecs and platforms to ensure good API coverage.
  *   o Support TDM on PCM and I2S
  */
-
+#define DEBUG
 #include <linux/module.h>
 #include <linux/moduleparam.h>
 #include <linux/init.h>
@@ -3383,13 +3383,23 @@ EXPORT_SYMBOL_GPL(snd_soc_put_strobe);
 int snd_soc_dai_set_sysclk(struct snd_soc_dai *dai, int clk_id,
 	unsigned int freq, int dir)
 {
+
+	if(dai->driver){
+		printk("        dai->driver\n");
+	}
+	if(dai->codec){
+                printk("        dai->codec\n");
+        }
+
 	if (dai->driver && dai->driver->ops->set_sysclk)
 		return dai->driver->ops->set_sysclk(dai, clk_id, freq, dir);
 	else if (dai->codec && dai->codec->driver->set_sysclk)
 		return dai->codec->driver->set_sysclk(dai->codec, clk_id, 0,
 						      freq, dir);
-	else
+	else{
+		printk("        [%s]ERROR[%s](%d)\n", __FILE__,  __func__, __LINE__);
 		return -EINVAL;
+	}
 }
 EXPORT_SYMBOL_GPL(snd_soc_dai_set_sysclk);
 
@@ -3409,8 +3419,10 @@ int snd_soc_codec_set_sysclk(struct snd_soc_codec *codec, int clk_id,
 	if (codec->driver->set_sysclk)
 		return codec->driver->set_sysclk(codec, clk_id, source,
 						 freq, dir);
-	else
+	else{
+		printk("        [%s]ERROR[%s](%d)\n", __FILE__,  __func__, __LINE__);
 		return -EINVAL;
+	}
 }
 EXPORT_SYMBOL_GPL(snd_soc_codec_set_sysclk);
 
@@ -3429,8 +3441,10 @@ int snd_soc_dai_set_clkdiv(struct snd_soc_dai *dai,
 {
 	if (dai->driver && dai->driver->ops->set_clkdiv)
 		return dai->driver->ops->set_clkdiv(dai, div_id, div);
-	else
+	else{
+		printk("        [%s]ERROR[%s](%d)\n", __FILE__,  __func__, __LINE__);
 		return -EINVAL;
+	}
 }
 EXPORT_SYMBOL_GPL(snd_soc_dai_set_clkdiv);
 
@@ -3453,8 +3467,10 @@ int snd_soc_dai_set_pll(struct snd_soc_dai *dai, int pll_id, int source,
 	else if (dai->codec && dai->codec->driver->set_pll)
 		return dai->codec->driver->set_pll(dai->codec, pll_id, source,
 						   freq_in, freq_out);
-	else
+	else{
+		printk("        [%s]ERROR[%s](%d)\n", __FILE__,  __func__, __LINE__);
 		return -EINVAL;
+	}
 }
 EXPORT_SYMBOL_GPL(snd_soc_dai_set_pll);
 
@@ -3474,8 +3490,10 @@ int snd_soc_codec_set_pll(struct snd_soc_codec *codec, int pll_id, int source,
 	if (codec->driver->set_pll)
 		return codec->driver->set_pll(codec, pll_id, source,
 					      freq_in, freq_out);
-	else
+	else{
+		printk("        [%s]ERROR[%s](%d)\n", __FILE__,  __func__, __LINE__);
 		return -EINVAL;
+	}
 }
 EXPORT_SYMBOL_GPL(snd_soc_codec_set_pll);
 
@@ -3488,10 +3506,14 @@ EXPORT_SYMBOL_GPL(snd_soc_codec_set_pll);
  */
 int snd_soc_dai_set_fmt(struct snd_soc_dai *dai, unsigned int fmt)
 {
-	if (dai->driver == NULL)
+	if (dai->driver == NULL){
+		printk("        [%s]ERROR[%s](%d)\n", __FILE__,  __func__, __LINE__);
 		return -EINVAL;
-	if (dai->driver->ops->set_fmt == NULL)
+	}
+	if (dai->driver->ops->set_fmt == NULL){
+		printk("        [%s]ERROR[%s](%d)\n", __FILE__,  __func__, __LINE__);
 		return -ENOTSUPP;
+	}
 	return dai->driver->ops->set_fmt(dai, fmt);
 }
 EXPORT_SYMBOL_GPL(snd_soc_dai_set_fmt);
@@ -3513,8 +3535,10 @@ int snd_soc_dai_set_tdm_slot(struct snd_soc_dai *dai,
 	if (dai->driver && dai->driver->ops->set_tdm_slot)
 		return dai->driver->ops->set_tdm_slot(dai, tx_mask, rx_mask,
 				slots, slot_width);
-	else
+	else{
+		printk("        [%s]ERROR[%s](%d)\n", __FILE__,  __func__, __LINE__);
 		return -EINVAL;
+	}
 }
 EXPORT_SYMBOL_GPL(snd_soc_dai_set_tdm_slot);
 
@@ -3537,8 +3561,10 @@ int snd_soc_dai_set_channel_map(struct snd_soc_dai *dai,
 	if (dai->driver && dai->driver->ops->set_channel_map)
 		return dai->driver->ops->set_channel_map(dai, tx_num, tx_slot,
 			rx_num, rx_slot);
-	else
+	else{
+		printk("        [%s]ERROR[%s](%d)\n", __FILE__,  __func__, __LINE__);
 		return -EINVAL;
+	}
 }
 EXPORT_SYMBOL_GPL(snd_soc_dai_set_channel_map);
 
@@ -3553,8 +3579,10 @@ int snd_soc_dai_set_tristate(struct snd_soc_dai *dai, int tristate)
 {
 	if (dai->driver && dai->driver->ops->set_tristate)
 		return dai->driver->ops->set_tristate(dai, tristate);
-	else
+	else{
+		printk("        [%s]ERROR[%s](%d)\n", __FILE__,  __func__, __LINE__);
 		return -EINVAL;
+	}
 }
 EXPORT_SYMBOL_GPL(snd_soc_dai_set_tristate);
 
@@ -3592,8 +3620,14 @@ int snd_soc_register_card(struct snd_soc_card *card)
 {
 	int i, ret;
 
-	if (!card->name || !card->dev)
+        if (!card->dev)
+		printk("    ERROR[%s]:%d\n", __func__, __LINE__);
+        if (!card->name)
+		printk("    ERROR[%s]:%d\n", __func__, __LINE__);
+
+	if (!card->name || !card->dev){
 		return -EINVAL;
+	}
 
 	for (i = 0; i < card->num_links; i++) {
 		struct snd_soc_dai_link *link = &card->dai_link[i];
@@ -3656,8 +3690,10 @@ int snd_soc_register_card(struct snd_soc_card *card)
 				 sizeof(struct snd_soc_pcm_runtime) *
 				 (card->num_links + card->num_aux_devs),
 				 GFP_KERNEL);
-	if (card->rtd == NULL)
+	if (card->rtd == NULL){
+		printk("    ERROR[%s]:%d\n", __func__, __LINE__);
 		return -ENOMEM;
+	}
 	card->num_rtd = 0;
 	card->rtd_aux = &card->rtd[card->num_links];
 

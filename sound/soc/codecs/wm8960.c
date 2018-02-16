@@ -130,6 +130,8 @@ struct wm8960_priv {
 	struct snd_soc_dapm_widget *out3;
 	bool deemph;
 	int playback_fs;
+	int sysclk;
+	int clk_id;
 };
 
 #define wm8960_reset(c)	snd_soc_write(c, WM8960_RESET, 0)
@@ -198,11 +200,11 @@ static int wm8960_get_deemph(struct snd_kcontrol *kcontrol,
 static int wm8960_put_deemph(struct snd_kcontrol *kcontrol,
 			     struct snd_ctl_elem_value *ucontrol)
 {
-
-        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	struct snd_soc_codec *codec = snd_kcontrol_chip(kcontrol);
 	struct wm8960_priv *wm8960 = snd_soc_codec_get_drvdata(codec);
 	int deemph = ucontrol->value.enumerated.item[0];
+
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 
 	if (deemph > 1){
 		printk("        ERROR: deemph > 1\n");
@@ -631,6 +633,8 @@ static int wm8960_mute(struct snd_soc_dai *dai, int mute)
         printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	struct snd_soc_codec *codec = dai->codec;
 
+	printk("        mute=%d\n", mute);
+
 	if (mute)
 		snd_soc_update_bits(codec, WM8960_DACCTL1, 0x8, 0x8);
 	else
@@ -947,6 +951,38 @@ static int wm8960_set_bias_level(struct snd_soc_codec *codec,
 	return wm8960->set_bias_level(codec, level);
 }
 
+static int wm8960_set_dai_sysclk(struct snd_soc_dai *dai, int clk_id,
+					unsigned int freq, int dir)
+{
+	printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
+	struct snd_soc_codec *codec = dai->codec;
+	struct wm8960_priv *wm8960 = snd_soc_codec_get_drvdata(codec);
+
+	switch (clk_id) {
+	case WM8960_SYSCLK_MCLK:
+		printk("        clk_id=WM8960_SYSCLK_MCLK\n");
+		snd_soc_update_bits(codec, WM8960_CLOCK1,
+					0x1, WM8960_SYSCLK_MCLK);
+		break;
+	case WM8960_SYSCLK_PLL:
+		printk("        clk_id=WM8960_SYSCLK_PLL\n");
+		snd_soc_update_bits(codec, WM8960_CLOCK1,
+					0x1, WM8960_SYSCLK_PLL);
+		break;
+	case WM8960_SYSCLK_AUTO:
+		printk("        clk_id=WM8960_SYSCLK_AUTO\n");
+		break;
+	default:
+		printk("        ERROR:[%s][%s]:%d\n", __FILE__,  __func__, __LINE__);
+		return -EINVAL;
+	}
+
+	wm8960->sysclk = freq;
+	wm8960->clk_id = clk_id;
+
+	return 0;
+}
+
 #define WM8960_RATES SNDRV_PCM_RATE_8000_48000
 
 #define WM8960_FORMATS \
@@ -959,6 +995,7 @@ static const struct snd_soc_dai_ops wm8960_dai_ops = {
 	.set_fmt = wm8960_set_dai_fmt,
 	.set_clkdiv = wm8960_set_dai_clkdiv,
 	.set_pll = wm8960_set_dai_pll,
+	.set_sysclk = wm8960_set_dai_sysclk,
 };
 
 static struct snd_soc_dai_driver wm8960_dai = {
