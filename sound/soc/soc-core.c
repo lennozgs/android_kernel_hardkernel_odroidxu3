@@ -22,6 +22,7 @@
  *   o Support TDM on PCM and I2S
  */
 #define DEBUG
+#include <linux/device.h>
 #include <linux/module.h>
 #include <linux/moduleparam.h>
 #include <linux/init.h>
@@ -73,6 +74,7 @@ MODULE_PARM_DESC(pmdown_time, "DAPM stream powerdown time (msecs)");
  * a particular given value */
 static int min_bytes_needed(unsigned long val)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	int c = 0;
 	int i;
 
@@ -92,6 +94,7 @@ static int min_bytes_needed(unsigned long val)
 static int format_register_str(struct snd_soc_codec *codec,
 			       unsigned int reg, char *buf, size_t len)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	int wordsize = min_bytes_needed(codec->driver->reg_cache_size) * 2;
 	int regsize = codec->driver->reg_word_size * 2;
 	int ret;
@@ -126,6 +129,7 @@ static int format_register_str(struct snd_soc_codec *codec,
 static ssize_t soc_codec_reg_show(struct snd_soc_codec *codec, char *buf,
 				  size_t count, loff_t pos)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	int i, step = 1;
 	int wordsize, regsize;
 	int len;
@@ -170,6 +174,7 @@ static ssize_t soc_codec_reg_show(struct snd_soc_codec *codec, char *buf,
 static ssize_t codec_reg_show(struct device *dev,
 	struct device_attribute *attr, char *buf)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	struct snd_soc_pcm_runtime *rtd = dev_get_drvdata(dev);
 
 	return soc_codec_reg_show(rtd->codec, buf, PAGE_SIZE, 0);
@@ -180,6 +185,7 @@ static DEVICE_ATTR(codec_reg, 0444, codec_reg_show, NULL);
 static ssize_t pmdown_time_show(struct device *dev,
 				struct device_attribute *attr, char *buf)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	struct snd_soc_pcm_runtime *rtd = dev_get_drvdata(dev);
 
 	return sprintf(buf, "%ld\n", rtd->pmdown_time);
@@ -189,6 +195,7 @@ static ssize_t pmdown_time_set(struct device *dev,
 			       struct device_attribute *attr,
 			       const char *buf, size_t count)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	struct snd_soc_pcm_runtime *rtd = dev_get_drvdata(dev);
 	int ret;
 
@@ -205,6 +212,7 @@ static DEVICE_ATTR(pmdown_time, 0644, pmdown_time_show, pmdown_time_set);
 static ssize_t codec_reg_read_file(struct file *file, char __user *user_buf,
 				   size_t count, loff_t *ppos)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	ssize_t ret;
 	struct snd_soc_codec *codec = file->private_data;
 	char *buf;
@@ -232,6 +240,7 @@ static ssize_t codec_reg_read_file(struct file *file, char __user *user_buf,
 static ssize_t codec_reg_write_file(struct file *file,
 		const char __user *user_buf, size_t count, loff_t *ppos)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	char buf[32];
 	size_t buf_size;
 	char *start = buf;
@@ -267,6 +276,7 @@ static const struct file_operations codec_reg_fops = {
 
 static void soc_init_codec_debugfs(struct snd_soc_codec *codec)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	struct dentry *debugfs_card_root = codec->card->debugfs_card_root;
 
 	codec->debugfs_codec_root = debugfs_create_dir(codec->name,
@@ -294,11 +304,13 @@ static void soc_init_codec_debugfs(struct snd_soc_codec *codec)
 
 static void soc_cleanup_codec_debugfs(struct snd_soc_codec *codec)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	debugfs_remove_recursive(codec->debugfs_codec_root);
 }
 
 static void soc_init_platform_debugfs(struct snd_soc_platform *platform)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	struct dentry *debugfs_card_root = platform->card->debugfs_card_root;
 
 	platform->debugfs_platform_root = debugfs_create_dir(platform->name,
@@ -315,12 +327,14 @@ static void soc_init_platform_debugfs(struct snd_soc_platform *platform)
 
 static void soc_cleanup_platform_debugfs(struct snd_soc_platform *platform)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	debugfs_remove_recursive(platform->debugfs_platform_root);
 }
 
 static ssize_t codec_list_read_file(struct file *file, char __user *user_buf,
 				    size_t count, loff_t *ppos)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	char *buf = kmalloc(PAGE_SIZE, GFP_KERNEL);
 	ssize_t len, ret = 0;
 	struct snd_soc_codec *codec;
@@ -355,6 +369,7 @@ static const struct file_operations codec_list_fops = {
 static ssize_t dai_list_read_file(struct file *file, char __user *user_buf,
 				  size_t count, loff_t *ppos)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	char *buf = kmalloc(PAGE_SIZE, GFP_KERNEL);
 	ssize_t len, ret = 0;
 	struct snd_soc_dai *dai;
@@ -388,6 +403,7 @@ static ssize_t platform_list_read_file(struct file *file,
 				       char __user *user_buf,
 				       size_t count, loff_t *ppos)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	char *buf = kmalloc(PAGE_SIZE, GFP_KERNEL);
 	ssize_t len, ret = 0;
 	struct snd_soc_platform *platform;
@@ -420,6 +436,7 @@ static const struct file_operations platform_list_fops = {
 
 static void soc_init_card_debugfs(struct snd_soc_card *card)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	card->debugfs_card_root = debugfs_create_dir(card->name,
 						     snd_soc_debugfs_root);
 	if (!card->debugfs_card_root) {
@@ -438,6 +455,7 @@ static void soc_init_card_debugfs(struct snd_soc_card *card)
 
 static void soc_cleanup_card_debugfs(struct snd_soc_card *card)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	debugfs_remove_recursive(card->debugfs_card_root);
 }
 
@@ -471,6 +489,7 @@ static inline void soc_cleanup_card_debugfs(struct snd_soc_card *card)
 struct snd_pcm_substream *snd_soc_get_dai_substream(struct snd_soc_card *card,
 		const char *dai_link, int stream)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	int i;
 
 	for (i = 0; i < card->num_links; i++) {
@@ -486,6 +505,7 @@ EXPORT_SYMBOL_GPL(snd_soc_get_dai_substream);
 struct snd_soc_pcm_runtime *snd_soc_get_pcm_runtime(struct snd_soc_card *card,
 		const char *dai_link)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	int i;
 
 	for (i = 0; i < card->num_links; i++) {
@@ -501,6 +521,7 @@ EXPORT_SYMBOL_GPL(snd_soc_get_pcm_runtime);
 /* unregister ac97 codec */
 static int soc_ac97_dev_unregister(struct snd_soc_codec *codec)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	if (codec->ac97->dev.bus)
 		device_unregister(&codec->ac97->dev);
 	return 0;
@@ -512,6 +533,7 @@ static void soc_ac97_device_release(struct device *dev){}
 /* register ac97 codec to bus */
 static int soc_ac97_dev_register(struct snd_soc_codec *codec)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	int err;
 
 	codec->ac97->dev.bus = &ac97_bus_type;
@@ -534,6 +556,7 @@ static int soc_ac97_dev_register(struct snd_soc_codec *codec)
 /* powers down audio subsystem for suspend */
 int snd_soc_suspend(struct device *dev)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	struct snd_soc_card *card = dev_get_drvdata(dev);
 	struct snd_soc_codec *codec;
 	int i;
@@ -672,6 +695,7 @@ EXPORT_SYMBOL_GPL(snd_soc_suspend);
  */
 static void soc_resume_deferred(struct work_struct *work)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	struct snd_soc_card *card =
 			container_of(work, struct snd_soc_card, deferred_resume_work);
 	struct snd_soc_codec *codec;
@@ -777,6 +801,7 @@ static void soc_resume_deferred(struct work_struct *work)
 /* powers up audio subsystem after a suspend */
 int snd_soc_resume(struct device *dev)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	struct snd_soc_card *card = dev_get_drvdata(dev);
 	int i, ac97_control = 0;
 
@@ -817,6 +842,7 @@ static const struct snd_soc_dai_ops null_dai_ops = {
 
 static int soc_bind_dai_link(struct snd_soc_card *card, int num)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	struct snd_soc_dai_link *dai_link = &card->dai_link[num];
 	struct snd_soc_pcm_runtime *rtd = &card->rtd[num];
 	struct snd_soc_codec *codec;
@@ -920,6 +946,7 @@ static int soc_remove_platform(struct snd_soc_platform *platform)
 {
 	int ret;
 
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	if (platform->driver->remove) {
 		ret = platform->driver->remove(platform);
 		if (ret < 0)
@@ -940,6 +967,7 @@ static int soc_remove_platform(struct snd_soc_platform *platform)
 
 static void soc_remove_codec(struct snd_soc_codec *codec)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	int err;
 
 	if (codec->driver->remove) {
@@ -959,6 +987,7 @@ static void soc_remove_codec(struct snd_soc_codec *codec)
 
 static void soc_remove_link_dais(struct snd_soc_card *card, int num, int order)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	struct snd_soc_pcm_runtime *rtd = &card->rtd[num];
 	struct snd_soc_dai *codec_dai = rtd->codec_dai, *cpu_dai = rtd->cpu_dai;
 	int err;
@@ -1008,6 +1037,7 @@ static void soc_remove_link_dais(struct snd_soc_card *card, int num, int order)
 static void soc_remove_link_components(struct snd_soc_card *card, int num,
 				       int order)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	struct snd_soc_pcm_runtime *rtd = &card->rtd[num];
 	struct snd_soc_dai *cpu_dai = rtd->cpu_dai;
 	struct snd_soc_dai *codec_dai = rtd->codec_dai;
@@ -1039,6 +1069,7 @@ static void soc_remove_link_components(struct snd_soc_card *card, int num,
 
 static void soc_remove_dai_links(struct snd_soc_card *card)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	int dai, order;
 
 	for (order = SND_SOC_COMP_ORDER_FIRST; order <= SND_SOC_COMP_ORDER_LAST;
@@ -1059,6 +1090,7 @@ static void soc_remove_dai_links(struct snd_soc_card *card)
 static void soc_set_name_prefix(struct snd_soc_card *card,
 				struct snd_soc_codec *codec)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	int i;
 
 	if (card->codec_conf == NULL)
@@ -1076,6 +1108,7 @@ static void soc_set_name_prefix(struct snd_soc_card *card,
 static int soc_probe_codec(struct snd_soc_card *card,
 			   struct snd_soc_codec *codec)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	int ret = 0;
 	const struct snd_soc_codec_driver *driver = codec->driver;
 	struct snd_soc_dai *dai;
@@ -1144,6 +1177,7 @@ err_probe:
 static int soc_probe_platform(struct snd_soc_card *card,
 			   struct snd_soc_platform *platform)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	int ret = 0;
 	const struct snd_soc_platform_driver *driver = platform->driver;
 	struct snd_soc_dai *dai;
@@ -1203,6 +1237,7 @@ err_probe:
 
 static void rtd_release(struct device *dev)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	kfree(dev);
 }
 
@@ -1210,6 +1245,7 @@ static int soc_post_component_init(struct snd_soc_card *card,
 				   struct snd_soc_codec *codec,
 				   int num, int dailess)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	struct snd_soc_dai_link *dai_link = NULL;
 	struct snd_soc_aux_dev *aux_dev = NULL;
 	struct snd_soc_pcm_runtime *rtd;
@@ -1300,6 +1336,7 @@ out:
 static int soc_probe_link_components(struct snd_soc_card *card, int num,
 				     int order)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	struct snd_soc_pcm_runtime *rtd = &card->rtd[num];
 	struct snd_soc_dai *cpu_dai = rtd->cpu_dai;
 	struct snd_soc_dai *codec_dai = rtd->codec_dai;
@@ -1336,6 +1373,7 @@ static int soc_probe_link_components(struct snd_soc_card *card, int num,
 
 static int soc_probe_link_dais(struct snd_soc_card *card, int num, int order)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	struct snd_soc_dai_link *dai_link = &card->dai_link[num];
 	struct snd_soc_pcm_runtime *rtd = &card->rtd[num];
 	struct snd_soc_codec *codec = rtd->codec;
@@ -1469,6 +1507,7 @@ static int soc_probe_link_dais(struct snd_soc_card *card, int num, int order)
 #ifdef CONFIG_SND_SOC_AC97_BUS
 static int soc_register_ac97_dai_link(struct snd_soc_pcm_runtime *rtd)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	int ret;
 
 	/* Only instantiate AC97 if not already done by the adaptor
@@ -1500,6 +1539,7 @@ static int soc_register_ac97_dai_link(struct snd_soc_pcm_runtime *rtd)
 
 static void soc_unregister_ac97_dai_link(struct snd_soc_codec *codec)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	if (codec->ac97_registered) {
 		soc_ac97_dev_unregister(codec);
 		codec->ac97_registered = 0;
@@ -1509,6 +1549,7 @@ static void soc_unregister_ac97_dai_link(struct snd_soc_codec *codec)
 
 static int soc_check_aux_dev(struct snd_soc_card *card, int num)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	struct snd_soc_aux_dev *aux_dev = &card->aux_dev[num];
 	struct snd_soc_codec *codec;
 
@@ -1525,6 +1566,7 @@ static int soc_check_aux_dev(struct snd_soc_card *card, int num)
 
 static int soc_probe_aux_dev(struct snd_soc_card *card, int num)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	struct snd_soc_aux_dev *aux_dev = &card->aux_dev[num];
 	struct snd_soc_codec *codec;
 	int ret = -ENODEV;
@@ -1558,6 +1600,7 @@ out:
 
 static void soc_remove_aux_dev(struct snd_soc_card *card, int num)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	struct snd_soc_pcm_runtime *rtd = &card->rtd_aux[num];
 	struct snd_soc_codec *codec = rtd->codec;
 
@@ -1575,6 +1618,7 @@ static void soc_remove_aux_dev(struct snd_soc_card *card, int num)
 static int snd_soc_init_codec_cache(struct snd_soc_codec *codec,
 				    enum snd_soc_compress_type compress_type)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	int ret;
 
 	if (codec->cache_init)
@@ -1595,6 +1639,7 @@ static int snd_soc_init_codec_cache(struct snd_soc_codec *codec,
 
 static int snd_soc_instantiate_card(struct snd_soc_card *card)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	struct snd_soc_codec *codec;
 	struct snd_soc_codec_conf *codec_conf;
 	enum snd_soc_compress_type compress_type;
@@ -1855,6 +1900,7 @@ base_error:
 /* probes a new socdev */
 static int soc_probe(struct platform_device *pdev)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	struct snd_soc_card *card = platform_get_drvdata(pdev);
 
 	/*
@@ -1876,6 +1922,7 @@ static int soc_probe(struct platform_device *pdev)
 
 static int soc_cleanup_card_resources(struct snd_soc_card *card)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	int i;
 
 	/* make sure any delayed work runs */
@@ -1907,6 +1954,7 @@ static int soc_cleanup_card_resources(struct snd_soc_card *card)
 /* removes a socdev */
 static int soc_remove(struct platform_device *pdev)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	struct snd_soc_card *card = platform_get_drvdata(pdev);
 
 	snd_soc_unregister_card(card);
@@ -1915,6 +1963,7 @@ static int soc_remove(struct platform_device *pdev)
 
 int snd_soc_poweroff(struct device *dev)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	struct snd_soc_card *card = dev_get_drvdata(dev);
 	int i;
 
@@ -1966,6 +2015,7 @@ static struct platform_driver soc_driver = {
 int snd_soc_codec_volatile_register(struct snd_soc_codec *codec,
 				    unsigned int reg)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	if (codec->volatile_register)
 		return codec->volatile_register(codec, reg);
 	else
@@ -1984,6 +2034,7 @@ EXPORT_SYMBOL_GPL(snd_soc_codec_volatile_register);
 int snd_soc_codec_readable_register(struct snd_soc_codec *codec,
 				    unsigned int reg)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	if (codec->readable_register)
 		return codec->readable_register(codec, reg);
 	else
@@ -2002,6 +2053,7 @@ EXPORT_SYMBOL_GPL(snd_soc_codec_readable_register);
 int snd_soc_codec_writable_register(struct snd_soc_codec *codec,
 				    unsigned int reg)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	if (codec->writable_register)
 		return codec->writable_register(codec, reg);
 	else
@@ -2012,6 +2064,7 @@ EXPORT_SYMBOL_GPL(snd_soc_codec_writable_register);
 int snd_soc_platform_read(struct snd_soc_platform *platform,
 					unsigned int reg)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	unsigned int ret;
 
 	if (!platform->driver->read) {
@@ -2030,6 +2083,7 @@ EXPORT_SYMBOL_GPL(snd_soc_platform_read);
 int snd_soc_platform_write(struct snd_soc_platform *platform,
 					 unsigned int reg, unsigned int val)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	if (!platform->driver->write) {
 		dev_err(platform->dev, "ASoC: platform has no write back\n");
 		return -1;
@@ -2052,6 +2106,7 @@ EXPORT_SYMBOL_GPL(snd_soc_platform_write);
 int snd_soc_new_ac97_codec(struct snd_soc_codec *codec,
 	struct snd_ac97_bus_ops *ops, int num)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	mutex_lock(&codec->mutex);
 
 	codec->ac97 = kzalloc(sizeof(struct snd_ac97), GFP_KERNEL);
@@ -2090,6 +2145,7 @@ EXPORT_SYMBOL_GPL(snd_soc_new_ac97_codec);
  */
 void snd_soc_free_ac97_codec(struct snd_soc_codec *codec)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	mutex_lock(&codec->mutex);
 #ifdef CONFIG_SND_SOC_AC97_BUS
 	soc_unregister_ac97_dai_link(codec);
@@ -2104,6 +2160,7 @@ EXPORT_SYMBOL_GPL(snd_soc_free_ac97_codec);
 
 unsigned int snd_soc_read(struct snd_soc_codec *codec, unsigned int reg)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	unsigned int ret;
 
 	ret = codec->read(codec, reg);
@@ -2117,6 +2174,7 @@ EXPORT_SYMBOL_GPL(snd_soc_read);
 unsigned int snd_soc_write(struct snd_soc_codec *codec,
 			   unsigned int reg, unsigned int val)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	dev_dbg(codec->dev, "write %x = %x\n", reg, val);
 	trace_snd_soc_reg_write(codec, reg, val);
 	return codec->write(codec, reg, val);
@@ -2126,6 +2184,7 @@ EXPORT_SYMBOL_GPL(snd_soc_write);
 unsigned int snd_soc_bulk_write_raw(struct snd_soc_codec *codec,
 				    unsigned int reg, const void *data, size_t len)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	return codec->bulk_write_raw(codec, reg, data, len);
 }
 EXPORT_SYMBOL_GPL(snd_soc_bulk_write_raw);
@@ -2144,6 +2203,7 @@ EXPORT_SYMBOL_GPL(snd_soc_bulk_write_raw);
 int snd_soc_update_bits(struct snd_soc_codec *codec, unsigned short reg,
 				unsigned int mask, unsigned int value)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	bool change;
 	unsigned int old, new;
 	int ret;
@@ -2185,6 +2245,7 @@ int snd_soc_update_bits_locked(struct snd_soc_codec *codec,
 			       unsigned short reg, unsigned int mask,
 			       unsigned int value)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	int change;
 
 	mutex_lock(&codec->mutex);
@@ -2210,6 +2271,7 @@ EXPORT_SYMBOL_GPL(snd_soc_update_bits_locked);
 int snd_soc_test_bits(struct snd_soc_codec *codec, unsigned short reg,
 				unsigned int mask, unsigned int value)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	int change;
 	unsigned int old, new;
 
@@ -2231,6 +2293,7 @@ EXPORT_SYMBOL_GPL(snd_soc_test_bits);
 int snd_soc_set_runtime_hwparams(struct snd_pcm_substream *substream,
 	const struct snd_pcm_hardware *hw)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	struct snd_pcm_runtime *runtime = substream->runtime;
 	runtime->hw.info = hw->info;
 	runtime->hw.formats = hw->formats;
@@ -2259,6 +2322,7 @@ struct snd_kcontrol *snd_soc_cnew(const struct snd_kcontrol_new *_template,
 				  void *data, const char *long_name,
 				  const char *prefix)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	struct snd_kcontrol_new template;
 	struct snd_kcontrol *kcontrol;
 	char *name = NULL;
@@ -2295,6 +2359,7 @@ static int snd_soc_add_controls(struct snd_card *card, struct device *dev,
 	const struct snd_kcontrol_new *controls, int num_controls,
 	const char *prefix, void *data)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	int err, i;
 
 	for (i = 0; i < num_controls; i++) {
@@ -2314,6 +2379,7 @@ static int snd_soc_add_controls(struct snd_card *card, struct device *dev,
 struct snd_kcontrol *snd_soc_card_get_kcontrol(struct snd_soc_card *soc_card,
 					       const char *name)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	struct snd_card *card = soc_card->snd_card;
 	struct snd_kcontrol *kctl;
 
@@ -2341,6 +2407,7 @@ EXPORT_SYMBOL_GPL(snd_soc_card_get_kcontrol);
 int snd_soc_add_codec_controls(struct snd_soc_codec *codec,
 	const struct snd_kcontrol_new *controls, int num_controls)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	struct snd_card *card = codec->card->snd_card;
 
 	return snd_soc_add_controls(card, codec->dev, controls, num_controls,
@@ -2361,6 +2428,7 @@ EXPORT_SYMBOL_GPL(snd_soc_add_codec_controls);
 int snd_soc_add_platform_controls(struct snd_soc_platform *platform,
 	const struct snd_kcontrol_new *controls, int num_controls)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	struct snd_card *card = platform->card->snd_card;
 
 	return snd_soc_add_controls(card, platform->dev, controls, num_controls,
@@ -2381,6 +2449,7 @@ EXPORT_SYMBOL_GPL(snd_soc_add_platform_controls);
 int snd_soc_add_card_controls(struct snd_soc_card *soc_card,
 	const struct snd_kcontrol_new *controls, int num_controls)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	struct snd_card *card = soc_card->snd_card;
 
 	return snd_soc_add_controls(card, soc_card->dev, controls, num_controls,
@@ -2401,6 +2470,7 @@ EXPORT_SYMBOL_GPL(snd_soc_add_card_controls);
 int snd_soc_add_dai_controls(struct snd_soc_dai *dai,
 	const struct snd_kcontrol_new *controls, int num_controls)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	struct snd_card *card = dai->card->snd_card;
 
 	return snd_soc_add_controls(card, dai->dev, controls, num_controls,
@@ -2421,6 +2491,7 @@ EXPORT_SYMBOL_GPL(snd_soc_add_dai_controls);
 int snd_soc_info_enum_double(struct snd_kcontrol *kcontrol,
 	struct snd_ctl_elem_info *uinfo)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	struct soc_enum *e = (struct soc_enum *)kcontrol->private_value;
 
 	uinfo->type = SNDRV_CTL_ELEM_TYPE_ENUMERATED;
@@ -2447,6 +2518,7 @@ EXPORT_SYMBOL_GPL(snd_soc_info_enum_double);
 int snd_soc_get_enum_double(struct snd_kcontrol *kcontrol,
 	struct snd_ctl_elem_value *ucontrol)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	struct snd_soc_codec *codec = snd_kcontrol_chip(kcontrol);
 	struct soc_enum *e = (struct soc_enum *)kcontrol->private_value;
 	unsigned int val;
@@ -2474,6 +2546,7 @@ EXPORT_SYMBOL_GPL(snd_soc_get_enum_double);
 int snd_soc_put_enum_double(struct snd_kcontrol *kcontrol,
 	struct snd_ctl_elem_value *ucontrol)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	struct snd_soc_codec *codec = snd_kcontrol_chip(kcontrol);
 	struct soc_enum *e = (struct soc_enum *)kcontrol->private_value;
 	unsigned int val;
@@ -2509,6 +2582,7 @@ EXPORT_SYMBOL_GPL(snd_soc_put_enum_double);
 int snd_soc_get_value_enum_double(struct snd_kcontrol *kcontrol,
 	struct snd_ctl_elem_value *ucontrol)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	struct snd_soc_codec *codec = snd_kcontrol_chip(kcontrol);
 	struct soc_enum *e = (struct soc_enum *)kcontrol->private_value;
 	unsigned int reg_val, val, mux;
@@ -2548,6 +2622,7 @@ EXPORT_SYMBOL_GPL(snd_soc_get_value_enum_double);
 int snd_soc_put_value_enum_double(struct snd_kcontrol *kcontrol,
 	struct snd_ctl_elem_value *ucontrol)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	struct snd_soc_codec *codec = snd_kcontrol_chip(kcontrol);
 	struct soc_enum *e = (struct soc_enum *)kcontrol->private_value;
 	unsigned int val;
@@ -2581,6 +2656,7 @@ EXPORT_SYMBOL_GPL(snd_soc_put_value_enum_double);
 int snd_soc_info_enum_ext(struct snd_kcontrol *kcontrol,
 	struct snd_ctl_elem_info *uinfo)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	struct soc_enum *e = (struct soc_enum *)kcontrol->private_value;
 
 	uinfo->type = SNDRV_CTL_ELEM_TYPE_ENUMERATED;
@@ -2607,6 +2683,7 @@ EXPORT_SYMBOL_GPL(snd_soc_info_enum_ext);
 int snd_soc_info_volsw_ext(struct snd_kcontrol *kcontrol,
 	struct snd_ctl_elem_info *uinfo)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	int max = kcontrol->private_value;
 
 	if (max == 1 && !strstr(kcontrol->id.name, " Volume"))
@@ -2634,6 +2711,7 @@ EXPORT_SYMBOL_GPL(snd_soc_info_volsw_ext);
 int snd_soc_info_volsw(struct snd_kcontrol *kcontrol,
 	struct snd_ctl_elem_info *uinfo)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	struct soc_mixer_control *mc =
 		(struct soc_mixer_control *)kcontrol->private_value;
 	int platform_max;
@@ -2667,6 +2745,7 @@ EXPORT_SYMBOL_GPL(snd_soc_info_volsw);
 int snd_soc_get_volsw(struct snd_kcontrol *kcontrol,
 	struct snd_ctl_elem_value *ucontrol)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	struct soc_mixer_control *mc =
 		(struct soc_mixer_control *)kcontrol->private_value;
 	struct snd_soc_codec *codec = snd_kcontrol_chip(kcontrol);
@@ -2713,6 +2792,7 @@ EXPORT_SYMBOL_GPL(snd_soc_get_volsw);
 int snd_soc_put_volsw(struct snd_kcontrol *kcontrol,
 	struct snd_ctl_elem_value *ucontrol)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	struct soc_mixer_control *mc =
 		(struct soc_mixer_control *)kcontrol->private_value;
 	struct snd_soc_codec *codec = snd_kcontrol_chip(kcontrol);
@@ -2769,6 +2849,7 @@ EXPORT_SYMBOL_GPL(snd_soc_put_volsw);
 int snd_soc_get_volsw_sx(struct snd_kcontrol *kcontrol,
 		      struct snd_ctl_elem_value *ucontrol)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	struct snd_soc_codec *codec = snd_kcontrol_chip(kcontrol);
 	struct soc_mixer_control *mc =
 	    (struct soc_mixer_control *)kcontrol->private_value;
@@ -2804,6 +2885,7 @@ EXPORT_SYMBOL_GPL(snd_soc_get_volsw_sx);
 int snd_soc_put_volsw_sx(struct snd_kcontrol *kcontrol,
 			 struct snd_ctl_elem_value *ucontrol)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	struct snd_soc_codec *codec = snd_kcontrol_chip(kcontrol);
 	struct soc_mixer_control *mc =
 	    (struct soc_mixer_control *)kcontrol->private_value;
@@ -2850,6 +2932,7 @@ EXPORT_SYMBOL_GPL(snd_soc_put_volsw_sx);
 int snd_soc_info_volsw_s8(struct snd_kcontrol *kcontrol,
 	struct snd_ctl_elem_info *uinfo)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	struct soc_mixer_control *mc =
 		(struct soc_mixer_control *)kcontrol->private_value;
 	int platform_max;
@@ -2879,6 +2962,7 @@ EXPORT_SYMBOL_GPL(snd_soc_info_volsw_s8);
 int snd_soc_get_volsw_s8(struct snd_kcontrol *kcontrol,
 	struct snd_ctl_elem_value *ucontrol)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	struct soc_mixer_control *mc =
 		(struct soc_mixer_control *)kcontrol->private_value;
 	struct snd_soc_codec *codec = snd_kcontrol_chip(kcontrol);
@@ -2906,6 +2990,7 @@ EXPORT_SYMBOL_GPL(snd_soc_get_volsw_s8);
 int snd_soc_put_volsw_s8(struct snd_kcontrol *kcontrol,
 	struct snd_ctl_elem_value *ucontrol)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	struct soc_mixer_control *mc =
 		(struct soc_mixer_control *)kcontrol->private_value;
 	struct snd_soc_codec *codec = snd_kcontrol_chip(kcontrol);
@@ -2933,6 +3018,7 @@ EXPORT_SYMBOL_GPL(snd_soc_put_volsw_s8);
 int snd_soc_info_volsw_range(struct snd_kcontrol *kcontrol,
 	struct snd_ctl_elem_info *uinfo)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	struct soc_mixer_control *mc =
 		(struct soc_mixer_control *)kcontrol->private_value;
 	int platform_max;
@@ -2963,6 +3049,7 @@ EXPORT_SYMBOL_GPL(snd_soc_info_volsw_range);
 int snd_soc_put_volsw_range(struct snd_kcontrol *kcontrol,
 	struct snd_ctl_elem_value *ucontrol)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	struct soc_mixer_control *mc =
 		(struct soc_mixer_control *)kcontrol->private_value;
 	struct snd_soc_codec *codec = snd_kcontrol_chip(kcontrol);
@@ -3012,6 +3099,7 @@ EXPORT_SYMBOL_GPL(snd_soc_put_volsw_range);
 int snd_soc_get_volsw_range(struct snd_kcontrol *kcontrol,
 	struct snd_ctl_elem_value *ucontrol)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	struct soc_mixer_control *mc =
 		(struct soc_mixer_control *)kcontrol->private_value;
 	struct snd_soc_codec *codec = snd_kcontrol_chip(kcontrol);
@@ -3057,6 +3145,7 @@ EXPORT_SYMBOL_GPL(snd_soc_get_volsw_range);
 int snd_soc_limit_volume(struct snd_soc_codec *codec,
 	const char *name, int max)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	struct snd_card *card = codec->card->snd_card;
 	struct snd_kcontrol *kctl;
 	struct soc_mixer_control *mc;
@@ -3087,6 +3176,7 @@ EXPORT_SYMBOL_GPL(snd_soc_limit_volume);
 int snd_soc_bytes_info(struct snd_kcontrol *kcontrol,
 		       struct snd_ctl_elem_info *uinfo)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	struct snd_soc_codec *codec = snd_kcontrol_chip(kcontrol);
 	struct soc_bytes *params = (void *)kcontrol->private_value;
 
@@ -3100,6 +3190,7 @@ EXPORT_SYMBOL_GPL(snd_soc_bytes_info);
 int snd_soc_bytes_get(struct snd_kcontrol *kcontrol,
 		      struct snd_ctl_elem_value *ucontrol)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	struct soc_bytes *params = (void *)kcontrol->private_value;
 	struct snd_soc_codec *codec = snd_kcontrol_chip(kcontrol);
 	int ret;
@@ -3137,6 +3228,7 @@ EXPORT_SYMBOL_GPL(snd_soc_bytes_get);
 int snd_soc_bytes_put(struct snd_kcontrol *kcontrol,
 		      struct snd_ctl_elem_value *ucontrol)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	struct soc_bytes *params = (void *)kcontrol->private_value;
 	struct snd_soc_codec *codec = snd_kcontrol_chip(kcontrol);
 	int ret, len;
@@ -3207,6 +3299,7 @@ EXPORT_SYMBOL_GPL(snd_soc_bytes_put);
 int snd_soc_info_xr_sx(struct snd_kcontrol *kcontrol,
 	struct snd_ctl_elem_info *uinfo)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	struct soc_mreg_control *mc =
 		(struct soc_mreg_control *)kcontrol->private_value;
 	uinfo->type = SNDRV_CTL_ELEM_TYPE_INTEGER;
@@ -3234,6 +3327,7 @@ EXPORT_SYMBOL_GPL(snd_soc_info_xr_sx);
 int snd_soc_get_xr_sx(struct snd_kcontrol *kcontrol,
 	struct snd_ctl_elem_value *ucontrol)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	struct soc_mreg_control *mc =
 		(struct soc_mreg_control *)kcontrol->private_value;
 	struct snd_soc_codec *codec = snd_kcontrol_chip(kcontrol);
@@ -3280,6 +3374,7 @@ EXPORT_SYMBOL_GPL(snd_soc_get_xr_sx);
 int snd_soc_put_xr_sx(struct snd_kcontrol *kcontrol,
 	struct snd_ctl_elem_value *ucontrol)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	struct soc_mreg_control *mc =
 		(struct soc_mreg_control *)kcontrol->private_value;
 	struct snd_soc_codec *codec = snd_kcontrol_chip(kcontrol);
@@ -3322,6 +3417,7 @@ EXPORT_SYMBOL_GPL(snd_soc_put_xr_sx);
 int snd_soc_get_strobe(struct snd_kcontrol *kcontrol,
 	struct snd_ctl_elem_value *ucontrol)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	struct soc_mixer_control *mc =
 		(struct soc_mixer_control *)kcontrol->private_value;
 	struct snd_soc_codec *codec = snd_kcontrol_chip(kcontrol);
@@ -3352,6 +3448,7 @@ EXPORT_SYMBOL_GPL(snd_soc_get_strobe);
 int snd_soc_put_strobe(struct snd_kcontrol *kcontrol,
 	struct snd_ctl_elem_value *ucontrol)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	struct soc_mixer_control *mc =
 		(struct soc_mixer_control *)kcontrol->private_value;
 	struct snd_soc_codec *codec = snd_kcontrol_chip(kcontrol);
@@ -3385,6 +3482,7 @@ EXPORT_SYMBOL_GPL(snd_soc_put_strobe);
 int snd_soc_dai_set_sysclk(struct snd_soc_dai *dai, int clk_id,
 	unsigned int freq, int dir)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 
 	if(dai->driver){
 		printk("        dai->driver\n");
@@ -3418,6 +3516,7 @@ EXPORT_SYMBOL_GPL(snd_soc_dai_set_sysclk);
 int snd_soc_codec_set_sysclk(struct snd_soc_codec *codec, int clk_id,
 			     int source, unsigned int freq, int dir)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	if (codec->driver->set_sysclk)
 		return codec->driver->set_sysclk(codec, clk_id, source,
 						 freq, dir);
@@ -3463,6 +3562,7 @@ EXPORT_SYMBOL_GPL(snd_soc_dai_set_clkdiv);
 int snd_soc_dai_set_pll(struct snd_soc_dai *dai, int pll_id, int source,
 	unsigned int freq_in, unsigned int freq_out)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	if (dai->driver && dai->driver->ops->set_pll)
 		return dai->driver->ops->set_pll(dai, pll_id, source,
 					 freq_in, freq_out);
@@ -3508,6 +3608,7 @@ EXPORT_SYMBOL_GPL(snd_soc_codec_set_pll);
  */
 int snd_soc_dai_set_fmt(struct snd_soc_dai *dai, unsigned int fmt)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	if (dai->driver == NULL){
 		printk("        [%s]ERROR[%s](%d)\n", __FILE__,  __func__, __LINE__);
 		return -EINVAL;
@@ -3534,6 +3635,7 @@ EXPORT_SYMBOL_GPL(snd_soc_dai_set_fmt);
 int snd_soc_dai_set_tdm_slot(struct snd_soc_dai *dai,
 	unsigned int tx_mask, unsigned int rx_mask, int slots, int slot_width)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	if (dai->driver && dai->driver->ops->set_tdm_slot)
 		return dai->driver->ops->set_tdm_slot(dai, tx_mask, rx_mask,
 				slots, slot_width);
@@ -3560,6 +3662,7 @@ int snd_soc_dai_set_channel_map(struct snd_soc_dai *dai,
 	unsigned int tx_num, unsigned int *tx_slot,
 	unsigned int rx_num, unsigned int *rx_slot)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	if (dai->driver && dai->driver->ops->set_channel_map)
 		return dai->driver->ops->set_channel_map(dai, tx_num, tx_slot,
 			rx_num, rx_slot);
@@ -3579,6 +3682,7 @@ EXPORT_SYMBOL_GPL(snd_soc_dai_set_channel_map);
  */
 int snd_soc_dai_set_tristate(struct snd_soc_dai *dai, int tristate)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	if (dai->driver && dai->driver->ops->set_tristate)
 		return dai->driver->ops->set_tristate(dai, tristate);
 	else{
@@ -3599,6 +3703,7 @@ EXPORT_SYMBOL_GPL(snd_soc_dai_set_tristate);
 int snd_soc_dai_digital_mute(struct snd_soc_dai *dai, int mute,
 			     int direction)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	if (!dai->driver)
 		return -ENOTSUPP;
 
@@ -3620,6 +3725,7 @@ EXPORT_SYMBOL_GPL(snd_soc_dai_digital_mute);
  */
 int snd_soc_register_card(struct snd_soc_card *card)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	int i, ret;
 
         if (!card->dev)
@@ -3724,6 +3830,7 @@ EXPORT_SYMBOL_GPL(snd_soc_register_card);
  */
 int snd_soc_unregister_card(struct snd_soc_card *card)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	if (card->instantiated)
 		soc_cleanup_card_resources(card);
 	dev_dbg(card->dev, "ASoC: Unregistered card '%s'\n", card->name);
@@ -3738,6 +3845,7 @@ EXPORT_SYMBOL_GPL(snd_soc_unregister_card);
  */
 static char *fmt_single_name(struct device *dev, int *id)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	char *found, name[NAME_SIZE];
 	int id1, id2;
 
@@ -3782,6 +3890,7 @@ static char *fmt_single_name(struct device *dev, int *id)
 static inline char *fmt_multiple_name(struct device *dev,
 		struct snd_soc_dai_driver *dai_drv)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	if (dai_drv->name == NULL) {
 		dev_err(dev, "ASoC: error - multiple DAI %s registered with"
 				" no name\n", dev_name(dev));
@@ -3799,6 +3908,7 @@ static inline char *fmt_multiple_name(struct device *dev,
 static int snd_soc_register_dai(struct device *dev,
 		struct snd_soc_dai_driver *dai_drv)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	struct snd_soc_codec *codec;
 	struct snd_soc_dai *dai;
 
@@ -3852,6 +3962,7 @@ static int snd_soc_register_dai(struct device *dev,
 static void snd_soc_unregister_dai(struct device *dev)
 {
 	struct snd_soc_dai *dai;
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 
 	list_for_each_entry(dai, &dai_list, list) {
 		if (dev == dai->dev)
@@ -3878,6 +3989,7 @@ found:
 static int snd_soc_register_dais(struct device *dev,
 		struct snd_soc_dai_driver *dai_drv, size_t count)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	struct snd_soc_codec *codec;
 	struct snd_soc_dai *dai;
 	int i, ret = 0;
@@ -3948,6 +4060,7 @@ err:
  */
 static void snd_soc_unregister_dais(struct device *dev, size_t count)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	int i;
 
 	for (i = 0; i < count; i++)
@@ -3963,6 +4076,7 @@ static void snd_soc_unregister_dais(struct device *dev, size_t count)
 int snd_soc_add_platform(struct device *dev, struct snd_soc_platform *platform,
 		const struct snd_soc_platform_driver *platform_drv)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	/* create platform component name */
 	platform->name = fmt_single_name(dev, &platform->id);
 	if (platform->name == NULL) {
@@ -3995,6 +4109,7 @@ EXPORT_SYMBOL_GPL(snd_soc_add_platform);
 int snd_soc_register_platform(struct device *dev,
 		const struct snd_soc_platform_driver *platform_drv)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	struct snd_soc_platform *platform;
 	int ret;
 
@@ -4018,6 +4133,7 @@ EXPORT_SYMBOL_GPL(snd_soc_register_platform);
  */
 void snd_soc_remove_platform(struct snd_soc_platform *platform)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	mutex_lock(&client_mutex);
 	list_del(&platform->list);
 	mutex_unlock(&client_mutex);
@@ -4030,6 +4146,7 @@ EXPORT_SYMBOL_GPL(snd_soc_remove_platform);
 
 struct snd_soc_platform *snd_soc_lookup_platform(struct device *dev)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	struct snd_soc_platform *platform;
 
 	list_for_each_entry(platform, &platform_list, list) {
@@ -4048,6 +4165,7 @@ EXPORT_SYMBOL_GPL(snd_soc_lookup_platform);
  */
 void snd_soc_unregister_platform(struct device *dev)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	struct snd_soc_platform *platform;
 
 	platform = snd_soc_lookup_platform(dev);
@@ -4085,6 +4203,7 @@ static u64 codec_format_map[] = {
  */
 static void fixup_codec_formats(struct snd_soc_pcm_stream *stream)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	int i;
 
 	for (i = 0; i < ARRAY_SIZE(codec_format_map); i++)
@@ -4102,6 +4221,7 @@ int snd_soc_register_codec(struct device *dev,
 			   struct snd_soc_dai_driver *dai_drv,
 			   int num_dai)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	size_t reg_size;
 	struct snd_soc_codec *codec;
 	int ret, i;
@@ -4207,6 +4327,7 @@ EXPORT_SYMBOL_GPL(snd_soc_register_codec);
  */
 void snd_soc_unregister_codec(struct device *dev)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	struct snd_soc_codec *codec;
 
 	list_for_each_entry(codec, &codec_list, list) {
@@ -4241,6 +4362,7 @@ int snd_soc_register_component(struct device *dev,
 			 struct snd_soc_dai_driver *dai_drv,
 			 int num_dai)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	struct snd_soc_component *cmpnt;
 	int ret;
 
@@ -4297,6 +4419,7 @@ EXPORT_SYMBOL_GPL(snd_soc_register_component);
  */
 void snd_soc_unregister_component(struct device *dev)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	struct snd_soc_component *cmpnt;
 
 	list_for_each_entry(cmpnt, &component_list, list) {
@@ -4321,6 +4444,7 @@ EXPORT_SYMBOL_GPL(snd_soc_unregister_component);
 int snd_soc_of_parse_card_name(struct snd_soc_card *card,
 			       const char *propname)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	struct device_node *np = card->dev->of_node;
 	int ret;
 
@@ -4344,6 +4468,7 @@ EXPORT_SYMBOL_GPL(snd_soc_of_parse_card_name);
 int snd_soc_of_parse_audio_routing(struct snd_soc_card *card,
 				   const char *propname)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	struct device_node *np = card->dev->of_node;
 	int num_routes;
 	struct snd_soc_dapm_route *routes;
@@ -4399,6 +4524,7 @@ EXPORT_SYMBOL_GPL(snd_soc_of_parse_audio_routing);
 unsigned int snd_soc_of_parse_daifmt(struct device_node *np,
 				     const char *prefix)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	int ret, i;
 	char prop[128];
 	unsigned int format = 0;
@@ -4505,6 +4631,7 @@ EXPORT_SYMBOL_GPL(snd_soc_of_parse_daifmt);
 
 static int __init snd_soc_init(void)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 #ifdef CONFIG_DEBUG_FS
 	snd_soc_debugfs_root = debugfs_create_dir("asoc", NULL);
 	if (IS_ERR(snd_soc_debugfs_root) || !snd_soc_debugfs_root) {
@@ -4533,6 +4660,7 @@ module_init(snd_soc_init);
 
 static void __exit snd_soc_exit(void)
 {
+        printk("@@@ [%s][%s:%d]\n", __FILE__, __func__, __LINE__);
 	snd_soc_util_exit();
 
 #ifdef CONFIG_DEBUG_FS
