@@ -125,18 +125,21 @@ static int i2s_enable(struct device *dev);
 /* If this is the 'overlay' stereo DAI */
 static inline bool is_secondary(struct i2s_dai *i2s)
 {
+	printk("[i2s.c][%s]\n", __func__);
 	return i2s->pri_dai ? true : false;
 }
 
 /* If operating in SoC-Slave mode */
 static inline bool is_slave(struct i2s_dai *i2s)
-{
+{                                                                                                                                                                                                                                                                                             
+	printk("[i2s.c][%s]\n", __func__);
 	return (readl(i2s->addr + I2SMOD) & i2s->slave_b) ? true : false;
 }
 
 /* If this interface of the controller is transmitting data */
 static inline bool tx_active(struct i2s_dai *i2s)
 {
+	printk("[i2s.c][%s]\n", __func__);
 	u32 active;
 
 	if (!i2s)
@@ -155,6 +158,7 @@ static inline bool tx_active(struct i2s_dai *i2s)
 /* If the other interface of the controller is transmitting data */
 static inline bool other_tx_active(struct i2s_dai *i2s)
 {
+	printk("[i2s.c][%s]\n", __func__);
 	struct i2s_dai *other = i2s->pri_dai ? : i2s->sec_dai;
 
 	return tx_active(other);
@@ -163,12 +167,14 @@ static inline bool other_tx_active(struct i2s_dai *i2s)
 /* If any interface of the controller is transmitting data */
 static inline bool any_tx_active(struct i2s_dai *i2s)
 {
+	printk("[i2s.c][%s]\n", __func__);
 	return tx_active(i2s) || other_tx_active(i2s);
 }
 
 /* If this interface of the controller is receiving data */
 static inline bool rx_active(struct i2s_dai *i2s)
 {
+	printk("[i2s.c][%s]\n", __func__);
 	u32 active;
 
 	if (!i2s)
@@ -182,6 +188,7 @@ static inline bool rx_active(struct i2s_dai *i2s)
 /* If the other interface of the controller is receiving data */
 static inline bool other_rx_active(struct i2s_dai *i2s)
 {
+	printk("[i2s.c][%s]\n", __func__);
 	struct i2s_dai *other = i2s->pri_dai ? : i2s->sec_dai;
 
 	return rx_active(other);
@@ -190,34 +197,40 @@ static inline bool other_rx_active(struct i2s_dai *i2s)
 /* If any interface of the controller is receiving data */
 static inline bool any_rx_active(struct i2s_dai *i2s)
 {
+	printk("[i2s.c][%s]\n", __func__);
 	return rx_active(i2s) || other_rx_active(i2s);
 }
 
 /* If the other DAI is transmitting or receiving data */
 static inline bool other_active(struct i2s_dai *i2s)
 {
+	printk("[i2s.c][%s]\n", __func__);
 	return other_rx_active(i2s) || other_tx_active(i2s);
 }
 
 /* If this DAI is transmitting or receiving data */
 static inline bool this_active(struct i2s_dai *i2s)
 {
+	printk("[i2s.c][%s]\n", __func__);
 	return tx_active(i2s) || rx_active(i2s);
 }
 
 /* If the controller is active anyway */
 static inline bool any_active(struct i2s_dai *i2s)
 {
+	printk("[i2s.c][%s]\n", __func__);
 	return this_active(i2s) || other_active(i2s);
 }
 
 static inline struct i2s_dai *to_info(struct snd_soc_dai *dai)
 {
+	printk("[i2s.c][%s]\n", __func__);
 	return snd_soc_dai_get_drvdata(dai);
 }
 
 static inline bool is_opened(struct i2s_dai *i2s)
 {
+	printk("[i2s.c][%s]\n", __func__);
 	if (i2s && (i2s->mode & DAI_OPENED))
 		return true;
 	else
@@ -226,6 +239,7 @@ static inline bool is_opened(struct i2s_dai *i2s)
 
 static inline bool is_manager(struct i2s_dai *i2s)
 {
+	printk("[i2s.c][%s]\n", __func__);
 	if (is_opened(i2s) && (i2s->mode & DAI_MANAGER))
 		return true;
 	else
@@ -235,6 +249,7 @@ static inline bool is_manager(struct i2s_dai *i2s)
 /* Read RCLK of I2S (in multiples of LRCLK) */
 static inline unsigned get_rfs(struct i2s_dai *i2s)
 {
+	printk("[i2s.c][%s]\n", __func__);
 	u32 rfs;
 
 	rfs = readl(i2s->addr + I2SMOD) >> i2s->rfs_sht;
@@ -255,6 +270,7 @@ static inline unsigned get_rfs(struct i2s_dai *i2s)
 /* Write RCLK of I2S (in multiples of LRCLK) */
 static inline void set_rfs(struct i2s_dai *i2s, unsigned rfs)
 {
+	printk("[i2s.c][%s]\n", __func__);
 	u32 mod = readl(i2s->addr + I2SMOD);
 	u32 val;
 
@@ -293,6 +309,7 @@ static inline void set_rfs(struct i2s_dai *i2s, unsigned rfs)
 /* Read Bit-Clock of I2S (in multiples of LRCLK) */
 static inline unsigned get_bfs(struct i2s_dai *i2s)
 {
+	printk("[i2s.c][%s]\n", __func__);
 	u32 bfs;
 
 	bfs = readl(i2s->addr + I2SMOD) >> i2s->bfs_sht;
@@ -314,6 +331,7 @@ static inline unsigned get_bfs(struct i2s_dai *i2s)
 /* Write Bit-Clock of I2S (in multiples of LRCLK) */
 static inline void set_bfs(struct i2s_dai *i2s, unsigned bfs)
 {
+	printk("[i2s.c][%s]\n", __func__);
 	u32 mod = readl(i2s->addr + I2SMOD);
 	u32 val;
 
@@ -358,6 +376,7 @@ static inline void set_bfs(struct i2s_dai *i2s, unsigned bfs)
 /* Sample-Size */
 static inline int get_blc(struct i2s_dai *i2s)
 {
+	printk("[i2s.c][%s]\n", __func__);
 	int blc = readl(i2s->addr + I2SMOD);
 
 	blc = (blc >> 13) & 0x3;
@@ -372,6 +391,7 @@ static inline int get_blc(struct i2s_dai *i2s)
 /* TX Channel Control */
 static void i2s_txctrl(struct i2s_dai *i2s, int on)
 {
+	printk("[i2s.c][%s]\n", __func__);
 	void __iomem *addr = i2s->addr;
 	u32 con = readl(addr + I2SCON);
 	u32 mod = readl(addr + I2SMOD);
@@ -423,6 +443,7 @@ static void i2s_txctrl(struct i2s_dai *i2s, int on)
 /* RX Channel Control */
 static void i2s_rxctrl(struct i2s_dai *i2s, int on)
 {
+	printk("[i2s.c][%s]\n", __func__);
 	void __iomem *addr = i2s->addr;
 	u32 con = readl(addr + I2SCON);
 	u32 mod = readl(addr + I2SMOD);
@@ -454,6 +475,7 @@ static void i2s_rxctrl(struct i2s_dai *i2s, int on)
 /* Flush FIFO of an interface */
 static inline void i2s_fifo(struct i2s_dai *i2s, u32 flush)
 {
+	printk("[i2s.c][%s]\n", __func__);
 	void __iomem *fic;
 	u32 val;
 
@@ -479,29 +501,66 @@ static inline void i2s_fifo(struct i2s_dai *i2s, u32 flush)
 static int i2s_set_sysclk(struct snd_soc_dai *dai,
 	  int clk_id, unsigned int rfs, int dir)
 {
+	printk("[i2s.c][%s]\n", __func__);
 	struct i2s_dai *i2s = to_info(dai);
 	struct i2s_dai *other = i2s->pri_dai ? : i2s->sec_dai;
 	u32 mod = readl(i2s->addr + I2SMOD);
 
 	switch (clk_id) {
 	case SAMSUNG_I2S_OPCLK:
+		printk("[i2s.c][%s] clk_id=SAMSUNG_I2S_OPCLK\n", __func__);
 		mod &= ~MOD_OPCLK_MASK;
 		mod |= dir;
 		break;
 
 	case SAMSUNG_I2S_CDCLK:
+		printk("[i2s.c][%s] clk_id=SAMSUNG_I2S_CDCLK\n", __func__);
+
+		printk("	dir=%d\n", dir);
+
 		/* Shouldn't matter in GATING(CLOCK_IN) mode */
 		if (dir == SND_SOC_CLOCK_IN)
 			rfs = 0;
 
-		if ((rfs && other->rfs && (other->rfs != rfs)) ||
-				(any_active(i2s) &&
-				(((dir == SND_SOC_CLOCK_IN)
-					&& !(mod & i2s->cdclk_b)) ||
-				((dir == SND_SOC_CLOCK_OUT)
-					&& (mod & i2s->cdclk_b))))) {
-			dev_err(&i2s->pdev->dev,
-				"%s:%d Other DAI busy\n", __func__, __LINE__);
+		printk("        rfs=%d\n", rfs);
+		printk("        other->rfs=%d\n", other->rfs);
+
+		if(any_active(i2s)){
+			printk("        any_active(i2s) == true\n", rfs);
+		}
+		else{
+			printk("        any_active(i2s) == false\n", rfs);
+		}
+
+                if(!(mod & i2s->cdclk_b)){
+                        printk("        !(mod & i2s->cdclk_b) == true\n", rfs);
+                }
+                else{
+                        printk("        !(mod & i2s->cdclk_b) == false\n", rfs);
+                }
+
+                if(mod & i2s->cdclk_b){
+                        printk("        mod & i2s->cdclk_b == true\n", rfs);
+                }
+                else{
+                        printk("        mod & i2s->cdclk_b == false\n", rfs);
+                }
+
+		if (
+			(
+				rfs &&
+				other->rfs &&
+				(other->rfs != rfs)
+			) ||
+			(
+				any_active(i2s) &&
+				(
+					(dir == SND_SOC_CLOCK_IN && !(mod & i2s->cdclk_b)) ||
+					(dir == SND_SOC_CLOCK_OUT && mod & i2s->cdclk_b)
+				)
+			)
+		){
+			dev_err(&i2s->pdev->dev, "%s:%d Other DAI busy\n", __func__, __LINE__);
 			return -EAGAIN;
 		}
 
@@ -515,6 +574,8 @@ static int i2s_set_sysclk(struct snd_soc_dai *dai,
 
 	case SAMSUNG_I2S_RCLKSRC_0: /* clock corrsponding to RCLKSRC := 0 */
 	case SAMSUNG_I2S_RCLKSRC_1: /* clock corrsponding to RCLKSRC := 1 */
+		printk("[i2s.c][%s] clk_id=SAMSUNG_I2S_RCLKSRC_0 || SAMSUNG_I2S_RCLKSRC_1\n", __func__);
+
 		if ((i2s->quirks & QUIRK_NO_MUXPSR)
 				|| (clk_id == SAMSUNG_I2S_RCLKSRC_0))
 			clk_id = 0;
@@ -577,6 +638,7 @@ static int i2s_set_sysclk(struct snd_soc_dai *dai,
 static int i2s_set_fmt(struct snd_soc_dai *dai,
 	unsigned int fmt)
 {
+	printk("[i2s.c][%s]\n", __func__);
 	struct i2s_dai *i2s = to_info(dai);
 	u32 mod = readl(i2s->addr + I2SMOD);
 	u32 tmp = 0;
@@ -651,6 +713,7 @@ static int i2s_set_fmt(struct snd_soc_dai *dai,
 static int i2s_hw_params(struct snd_pcm_substream *substream,
 	struct snd_pcm_hw_params *params, struct snd_soc_dai *dai)
 {
+	printk("[i2s.c][%s]\n", __func__);
 	struct i2s_dai *i2s = to_info(dai);
 	u32 mod = readl(i2s->addr + I2SMOD);
 
@@ -736,6 +799,7 @@ static int i2s_hw_params(struct snd_pcm_substream *substream,
 
 static void i2s_reg_save(struct i2s_dai *i2s)
 {
+	printk("[i2s.c][%s]\n", __func__);
 #ifdef CONFIG_SND_SAMSUNG_IDMA
 	u32 n, offset;
 #endif
@@ -758,6 +822,7 @@ static void i2s_reg_save(struct i2s_dai *i2s)
 
 static void i2s_reg_restore(struct i2s_dai *i2s)
 {
+	printk("[i2s.c][%s]\n", __func__);
 #ifdef CONFIG_SND_SAMSUNG_IDMA
 	u32 n, offset;
 #endif
@@ -782,6 +847,7 @@ static void i2s_reg_restore(struct i2s_dai *i2s)
 static int i2s_startup(struct snd_pcm_substream *substream,
 	  struct snd_soc_dai *dai)
 {
+	printk("[i2s.c][%s]\n", __func__);
 	struct i2s_dai *i2s = to_info(dai);
 	struct i2s_dai *other = i2s->pri_dai ? : i2s->sec_dai;
 	struct platform_device *pdev = NULL;
@@ -817,6 +883,7 @@ static int i2s_startup(struct snd_pcm_substream *substream,
 static void i2s_shutdown(struct snd_pcm_substream *substream,
 	struct snd_soc_dai *dai)
 {
+	printk("[i2s.c][%s]\n", __func__);
 	struct i2s_dai *i2s = to_info(dai);
 	struct i2s_dai *other = i2s->pri_dai ? : i2s->sec_dai;
 	struct platform_device *pdev = NULL;
@@ -851,6 +918,7 @@ static void i2s_shutdown(struct snd_pcm_substream *substream,
 
 static int config_setup(struct i2s_dai *i2s)
 {
+	printk("[i2s.c][%s]\n", __func__);
 	struct i2s_dai *other = i2s->pri_dai ? : i2s->sec_dai;
 	unsigned rfs, bfs, blc;
 	u32 psr;
@@ -911,6 +979,7 @@ static int config_setup(struct i2s_dai *i2s)
 static int i2s_trigger(struct snd_pcm_substream *substream,
 	int cmd, struct snd_soc_dai *dai)
 {
+	printk("[i2s.c][%s]\n", __func__);
 	int capture = (substream->stream == SNDRV_PCM_STREAM_CAPTURE);
 	struct snd_soc_pcm_runtime *rtd = substream->private_data;
 	struct i2s_dai *i2s = to_info(rtd->cpu_dai);
@@ -957,6 +1026,7 @@ static int i2s_trigger(struct snd_pcm_substream *substream,
 static int i2s_set_clkdiv(struct snd_soc_dai *dai,
 	int div_id, int div)
 {
+	printk("[i2s.c][%s]\n", __func__);
 	struct i2s_dai *i2s = to_info(dai);
 	struct i2s_dai *other = i2s->pri_dai ? : i2s->sec_dai;
 
@@ -982,22 +1052,30 @@ static int i2s_set_clkdiv(struct snd_soc_dai *dai,
 static snd_pcm_sframes_t
 i2s_delay(struct snd_pcm_substream *substream, struct snd_soc_dai *dai)
 {
+	printk("[i2s.c][%s]\n", __func__);
 	struct i2s_dai *i2s = to_info(dai);
 	u32 reg = readl(i2s->addr + I2SFIC);
 	snd_pcm_sframes_t delay;
 
-	if (substream->stream == SNDRV_PCM_STREAM_CAPTURE)
+	if (substream->stream == SNDRV_PCM_STREAM_CAPTURE){
+		printk("    substream->stream == SNDRV_PCM_STREAM_CAPTURE\n");
 		delay = FIC_RXCOUNT(reg);
-	else if (is_secondary(i2s))
+	}
+	else if (is_secondary(i2s)){
+		printk("    is_secondary(i2s)\n");
 		delay = FICS_TXCOUNT(readl(i2s->addr + I2SFICS));
-	else
+	}
+	else{
+		printk("    !is_secondary(i2s) && substream->stream != SNDRV_PCM_STREAM_CAPTURE\n");
 		delay = FIC_TXCOUNT(reg);
+	}
 
 	return delay;
 }
 
 static void i2s_init_bit_slice(struct i2s_dai *i2s)
 {
+	printk("[i2s.c][%s]\n", __func__);
 	if (i2s->quirks & QUIRK_SUPPORTS_TDM) {	/* IIS V5.1 (new) */
 		if (i2s->quirks & QUIRK_SUPPORTS_LOW_RFS) {
 			i2s->lrp_b   = EXYNOS5430_MOD_LRP;
@@ -1043,6 +1121,7 @@ static void i2s_init_bit_slice(struct i2s_dai *i2s)
 int i2s_get_fifo_cnt(struct snd_pcm_substream * substream,
 			struct snd_soc_dai *dai)
 {
+	printk("[i2s.c][%s]\n", __func__);
 	struct i2s_dai *i2s = to_info(dai);
 	u32 fic = readl(i2s->addr + I2SFIC);
 	u32 fics = readl(i2s->addr + I2SFICS);
@@ -1058,6 +1137,7 @@ int i2s_get_fifo_cnt(struct snd_pcm_substream * substream,
 void i2s_write_fifo(struct snd_pcm_substream * substream,
 			struct snd_soc_dai *dai, u32 val)
 {
+	printk("[i2s.c][%s]\n", __func__);
 	struct i2s_dai *i2s = to_info(dai);
 
 	writel(val, i2s->addr + (is_secondary(i2s) ? I2STXDS : I2STXD));
@@ -1066,6 +1146,7 @@ void i2s_write_fifo(struct snd_pcm_substream * substream,
 u32 i2s_read_fifo(struct snd_pcm_substream * substream,
 			struct snd_soc_dai *dai)
 {
+	printk("[i2s.c][%s]\n", __func__);
 	struct i2s_dai *i2s = to_info(dai);
 
 	return readl(i2s->addr + I2SRXD);
@@ -1080,6 +1161,7 @@ static struct samsung_fdma_cpu_ops cpu_ops = {
 
 static void i2s_cfg_gpio(struct i2s_dai *i2s, const char *name)
 {
+	printk("[i2s.c][%s]\n", __func__);
 	struct platform_device *pdev;
 	struct s3c_audio_pdata *i2s_pdata;
 
@@ -1103,6 +1185,7 @@ err:
 #ifdef CONFIG_PM
 static int i2s_suspend(struct snd_soc_dai *dai)
 {
+	printk("[i2s.c][%s]\n", __func__);
 	struct i2s_dai *i2s = to_info(dai);
 
 	if (dai->active) {
@@ -1115,6 +1198,7 @@ static int i2s_suspend(struct snd_soc_dai *dai)
 
 static int i2s_resume(struct snd_soc_dai *dai)
 {
+	printk("[i2s.c][%s]\n", __func__);
 	struct i2s_dai *i2s = to_info(dai);
 
 	if (dai->active) {
@@ -1131,6 +1215,7 @@ static int i2s_resume(struct snd_soc_dai *dai)
 
 static int samsung_i2s_dai_probe(struct snd_soc_dai *dai)
 {
+	printk("[i2s.c][%s]\n", __func__);
 	struct i2s_dai *i2s = to_info(dai);
 	struct i2s_dai *other = i2s->pri_dai ? : i2s->sec_dai;
 
@@ -1186,6 +1271,7 @@ probe_exit:
 
 static int samsung_i2s_dai_remove(struct snd_soc_dai *dai)
 {
+	printk("[i2s.c][%s]\n", __func__);
 	struct i2s_dai *i2s = snd_soc_dai_get_drvdata(dai);
 	struct i2s_dai *other = i2s->pri_dai ? : i2s->sec_dai;
 
@@ -1228,6 +1314,7 @@ static const struct snd_soc_component_driver samsung_i2s_component = {
 
 static struct i2s_dai *i2s_alloc_dai(struct platform_device *pdev, bool sec)
 {
+	printk("[i2s.c][%s]\n", __func__);
 	struct i2s_dai *i2s;
 	int ret;
 
@@ -1273,6 +1360,7 @@ static const struct of_device_id exynos_i2s_match[];
 
 static inline int samsung_i2s_get_driver_data(struct platform_device *pdev)
 {
+	printk("[i2s.c][%s]\n", __func__);
 #ifdef CONFIG_OF
 	struct samsung_i2s_dai_data *data;
 	if (pdev->dev.of_node) {
@@ -1288,6 +1376,7 @@ static inline int samsung_i2s_get_driver_data(struct platform_device *pdev)
 #ifdef CONFIG_PM_RUNTIME
 static int i2s_runtime_suspend(struct device *dev)
 {
+	printk("[i2s.c][%s]\n", __func__);
 	struct i2s_dai *i2s = dev_get_drvdata(dev);
 
 	pr_debug("%s entered\n", __func__);
@@ -1302,6 +1391,7 @@ static int i2s_runtime_suspend(struct device *dev)
 
 static int i2s_runtime_resume(struct device *dev)
 {
+	printk("[i2s.c][%s]\n", __func__);
 	struct i2s_dai *i2s = dev_get_drvdata(dev);
 
 	pr_debug("%s entered\n", __func__);
@@ -1316,6 +1406,7 @@ static int i2s_runtime_resume(struct device *dev)
 #else
 static int i2s_disable(struct device *dev)
 {
+	printk("[i2s.c][%s]\n", __func__);
 	struct i2s_dai *i2s = dev_get_drvdata(dev);
 
 	spin_lock(&lock);
@@ -1336,6 +1427,7 @@ static int i2s_disable(struct device *dev)
 
 static int i2s_enable(struct device *dev)
 {
+	printk("[i2s.c][%s]\n", __func__);
 	struct i2s_dai *i2s = dev_get_drvdata(dev);
 
 	spin_lock(&lock);
@@ -1357,6 +1449,7 @@ static int i2s_enable(struct device *dev)
 
 static int samsung_i2s_probe(struct platform_device *pdev)
 {
+	printk("[i2s.c][%s]\n", __func__);
 	struct i2s_dai *pri_dai, *sec_dai = NULL;
 	struct s3c_audio_pdata *i2s_pdata = pdev->dev.platform_data;
 	struct samsung_i2s *i2s_cfg = NULL;
@@ -1565,6 +1658,7 @@ err:
 
 static int samsung_i2s_remove(struct platform_device *pdev)
 {
+	printk("[i2s.c][%s]\n", __func__);
 	struct i2s_dai *i2s, *other;
 	struct resource *res;
 

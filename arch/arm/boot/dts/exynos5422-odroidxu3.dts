@@ -458,7 +458,7 @@
 		clock-frequency = <400000>;
 		status = "okay";
 		audio_codec: codec@10 {
-			compatible = "maxim,max98090";
+			compatible = "google,voicehat";
 			reg = <0x10>;
 		};
 	};
@@ -778,7 +778,7 @@
 	};
 
 	sound {
-		compatible = "hardkernel,odroid-max98090";
+		compatible = "googlevoicehat,googlevoicehat-soundcard";
 		clocks = <&clock 6>;		/* fout_epll */
 		clock-names = "fout_epll";
 		samsung,audio-cpu = <&i2s0		/* primary */

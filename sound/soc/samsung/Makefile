@@ -11,6 +11,9 @@ snd-soc-pcm-objs := pcm.o
 snd-soc-i2s-objs := i2s.o
 snd-soc-lpass-objs := lpass.o
 
+# Google voiceHAT custom codec support
+snd-soc-smdk5422-googlevoicehat-codecs-objs := smdk5422_googlevoicehat_codecs.o
+
 obj-$(CONFIG_SND_SOC_SAMSUNG) += snd-soc-s3c24xx.o
 obj-$(CONFIG_SND_S3C24XX_I2S) += snd-soc-s3c24xx-i2s.o
 obj-$(CONFIG_SND_SAMSUNG_AC97) += snd-soc-ac97.o
@@ -51,6 +54,7 @@ snd-soc-xyref5430-es515-objs := xyref5430_es515.o
 snd-soc-smdk5422-wm8994-objs := smdk5422_wm8994.o
 snd-soc-xyref5422-es515-objs := xyref5422_es515.o
 snd-soc-odroid-max98090-objs := odroid_max98090.o
+snd-soc-smdk5422-googlevoicehat-objs := smdk5422_googlevoicehat.o
 
 obj-$(CONFIG_SND_SOC_SAMSUNG_JIVE_WM8750) += snd-soc-jive-wm8750.o
 obj-$(CONFIG_SND_SOC_SAMSUNG_NEO1973_WM8753) += snd-soc-neo1973-wm8753.o
@@ -79,5 +83,7 @@ obj-$(CONFIG_SND_SOC_SAMSUNG_XYREF5430_ES515) += snd-soc-xyref5430-es515.o
 obj-$(CONFIG_SND_SOC_SAMSUNG_SMDK5422_WM8994) += snd-soc-smdk5422-wm8994.o
 obj-$(CONFIG_SND_SOC_SAMSUNG_XYREF5422_ES515) += snd-soc-xyref5422-es515.o
 obj-$(CONFIG_SND_SOC_SAMSUNG_ODROID_MAX98090) += snd-soc-odroid-max98090.o
+obj-$(CONFIG_SND_SOC_SAMSUNG_SMDK5422_GOOGLEVOICEHAT) += snd-soc-smdk5422-googlevoicehat.o
+obj-$(CONFIG_SND_SOC_SAMSUNG_SMDK5422_GOOGLEVOICEHAT)  += snd-soc-smdk5422-googlevoicehat-codecs.o
 
 obj-$(CONFIG_SND_SAMSUNG_SEIREN) += seiren/
